@@ -37,10 +37,6 @@ esbuild
             to: ['dist/style/font.css'],
           },
           {
-            from: ['package.json', 'README.md', 'LICENSE'],
-            to: ['dist/*'],
-          },
-          {
             from: ['src/**/*'],
             to: ['dist/src/'],
             keepStructure: true,
