@@ -2,6 +2,10 @@
 
 A Lit based pdf viewer that uses the Mozilla's pdfjs lib.
 
+## Live demo
+
+https://korial29.github.io/lit-pdf-viewer/
+
 ## Basic usage
 
 ```html
