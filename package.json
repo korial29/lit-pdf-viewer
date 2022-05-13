@@ -31,7 +31,7 @@
     "vitest": "^0.8.1"
   },
   "scripts": {
-    "start": "cp -r assets/fonts www && cp -r assets/style www/style && node ./serve.js",
+    "start": "cp -r node_modules/pdfjs-dist www && cp -r assets/fonts www && cp -r assets/style www/style && node ./serve.js",
     "build": "node ./build.js",
     "lint:eslint": "eslint . --ext .js,.ts",
     "format:eslint": "eslint . --ext .js,.ts --fix",

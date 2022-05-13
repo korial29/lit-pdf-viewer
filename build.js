@@ -6,7 +6,7 @@ esbuild
   .build({
     bundle: true,
     splitting: true,
-    entryPoints: [`www/index.js`],
+    entryPoints: [`src/index.js`],
     outdir: `dist`,
     tsconfig: `tsconfig.build.json`,
     format: 'esm',
@@ -35,10 +35,6 @@ esbuild
           {
             from: ['assets/style/font.css'],
             to: ['dist/style/font.css'],
-          },
-          {
-            from: ['www/index.html'],
-            to: ['dist/index.html'],
           },
           {
             from: ['package.json', 'README.md', 'LICENSE'],
