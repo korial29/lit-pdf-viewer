@@ -31,7 +31,7 @@ Copy the `node_modules/lit-pdf-viewer/pdfjs-dist` folder in your project bundle 
 
 ### Font icons
 
-The components comes with a custom icon font, displayed in the toolbar.  
+The component comes with a custom icon font, displayed in the toolbar.  
 Copy `node_modules/lit-pdf-viewer/fonts` and `node_modules/lit-pdf-viewer/style` folders in your project bundle folder.
 
 
@@ -68,8 +68,7 @@ Add a support for mutliphrase search in the pdf document.
 ```javascript
 const multiplePhrase = [
   'php application',
-  'Javascipt is awesome',
-  '',
+  'Javascript is awesome',
 ];
 
 <lit-pdf-viewer
