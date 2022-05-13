@@ -5,7 +5,7 @@ const { sassPlugin } = require('esbuild-sass-plugin');
 esbuild
   .build({
     bundle: true,
-    splitting: true,
+    minify: true,
     entryPoints: [`src/index.js`],
     outdir: `dist`,
     tsconfig: `tsconfig.build.json`,
