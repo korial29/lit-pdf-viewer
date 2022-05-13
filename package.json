@@ -1,7 +1,18 @@
 {
   "name": "lit-pdf-viewer",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "version": "1.0.0",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/korial29/lit-pdf-viewer.git"
+  },
+  "keywords": [
+    "lit-pdf-viewer"
+  ],
+  "author": "Ludovic Dupont <ludovic.dupont29@gmail.com>",
   "dependencies": {
     "lit": "^2.2.2",
     "pdfjs-dist": "^2.13.216"
