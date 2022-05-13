@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.alias.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "target": "es2017",
+    "module": "es2020",
+    "skipLibCheck": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "listEmittedFiles": true
+  }
+}

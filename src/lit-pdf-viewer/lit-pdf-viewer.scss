@@ -1,0 +1,223 @@
+@import '../../assets/style/colors.scss';
+
+:host {
+  --page-margin: 1px auto -8px;
+  --page-border: 9px solid transparent;
+
+  * {
+    padding: 0;
+    margin: 0;
+  }
+
+  section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-size: 2rem;
+  }
+
+  #viewerContainer {
+    position: absolute;
+    overflow: auto;
+    inset: 34px 0 0 0 !important;
+    width: 100%;
+    top: 5rem;
+    bottom: 4rem;
+    left: 0;
+    right: 0;
+  }
+
+  .page {
+    direction: ltr;
+    width: 816px;
+    height: 1056px;
+    margin: var(--page-margin);
+    position: relative;
+    overflow: visible;
+    border: var(--page-border);
+    background-clip: content-box;
+    background-color: rgba(255, 255, 255, 1);
+  }
+
+  canvas {
+    margin: auto;
+    display: block;
+  }
+
+  .textLayer {
+    position: absolute;
+    text-align: initial;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    opacity: 0.2;
+    line-height: 1;
+    -webkit-text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    text-size-adjust: none;
+    forced-color-adjust: none;
+
+    span,
+    br {
+      color: transparent;
+      position: absolute;
+      white-space: pre;
+      cursor: text;
+      transform-origin: 0% 0%;
+    }
+
+    /* Only necessary in Google Chrome, see issue 14205, and most unfortunately
+   * the problem doesn't show up in "text" reference tests. */
+    span.markedContent {
+      top: 0;
+      height: 0;
+    }
+
+    .highlight {
+      margin: -1px;
+      padding: 1px;
+      background-color: rgba(180, 0, 170, 1);
+      border-radius: 4px;
+    }
+
+    .highlight.appended {
+      position: initial;
+    }
+
+    .highlight.begin {
+      border-radius: 4px 0 0 4px;
+    }
+
+    .highlight.end {
+      border-radius: 0 4px 4px 0;
+    }
+
+    .highlight.middle {
+      border-radius: 0;
+    }
+
+    .highlight.selected {
+      background-color: rgba(0, 100, 0, 1);
+    }
+
+    &::-moz-selection {
+      background: rgba(0, 0, 255, 1);
+    }
+
+    &::selection {
+      background: rgba(0, 0, 255, 1);
+    }
+
+    /* Avoids https://github.com/mozilla/pdf.js/issues/13840 in Chrome */
+    br::-moz-selection {
+      background: transparent;
+    }
+    br::selection {
+      background: transparent;
+    }
+
+    .endOfContent {
+      display: block;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      cursor: default;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    .endOfContent.active {
+      top: 0;
+    }
+  }
+
+  .pdfViewer.removePageBorders .page {
+    margin: 0 auto 10px;
+    border: none;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  @keyframes moveDefault {
+    from {
+      background-position: 0 top;
+    }
+
+    to {
+      background-position: -39rem top;
+    }
+  }
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-self: center;
+
+    .modalContent {
+      padding: 24px;
+      box-shadow: $shadow;
+      background-color: #fff;
+      border-radius: 8px;
+      margin: 0 auto;
+    }
+  }
+
+  .loadingText {
+    display: block;
+    text-align: center;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+  }
+
+  .loadingBar {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    width: 200px;
+
+    .progress {
+      text-align: center;
+      color: #fff;
+      padding: 4px;
+      border-radius: 12px;
+      font-size: 0.6rem;
+      background-color: #{map-get($primary-color, 'medium')};
+      transition: width 200ms;
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  [hidden] {
+    display: none;
+  }
+}
+
+:host([loaded]) {
+  .pdfViewer .page .loadingIcon {
+    display: none;
+  }
+
+  .modal {
+    display: none;
+  }
+}
