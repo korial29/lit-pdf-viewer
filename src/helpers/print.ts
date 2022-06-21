@@ -159,18 +159,18 @@ export default class PdfPrintService {
     ifrm.style.top = '-10000px';
     ifrm.setAttribute('sandbox', 'allow-modals allow-same-origin allow-scripts');
     ifrm.setAttribute('id', 'printPage');
-    // const style = document.createElement('style');
-
-    // document.body.appendChild(this._printContainer);
     document.body.appendChild(ifrm);
 
+    this._setIframeStyle(ifrm);
+
+    return ifrm;
+  }
+
+  private _setIframeStyle(ifrm: HTMLIFrameElement): void {
     const iframeDocument = ifrm.contentDocument || ifrm.contentWindow.document;
     const style = document.createElement('style');
     style.textContent = printStyle.cssText;
-
     iframeDocument.head.appendChild(style);
-
-    return ifrm;
   }
 
   private _copyCanvasInIframe(ifrm: HTMLIFrameElement): void {
@@ -180,7 +180,6 @@ export default class PdfPrintService {
     ifrmBody.appendChild(this._printContainer);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _print(ifrm: HTMLIFrameElement): void {
     if (!this._aborted) {
       setTimeout(() => {
