@@ -92,6 +92,9 @@ export class LitPdfToolbar extends LitElement {
         >
           <lit-icon icon="rotate-cw" alt="Rotate clockwise"></lit-icon>
         </button>
+        <button class="toolbarButton print" title="Print" id="RotateCw" @click=${this._handlePrint}>
+          <lit-icon icon="rotate-cw" alt="Rotate clockwise"></lit-icon>
+        </button>
       </section>
     `;
   }
@@ -135,5 +138,9 @@ export class LitPdfToolbar extends LitElement {
 
   private _handleRotateCcw(): void {
     this.dispatchEvent(new CustomEvent('rotateCcw', { bubbles: true }));
+  }
+
+  private _handlePrint(): void {
+    this.dispatchEvent(new CustomEvent('print', { bubbles: true }));
   }
 }

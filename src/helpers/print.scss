@@ -1,0 +1,33 @@
+@media print {
+  body {
+    background: rgba(0, 0, 0, 0) none;
+  }
+
+  #printPageContainer {
+    height: 100%;
+  }
+
+  /* wrapper around (scaled) print canvas elements */
+  #printPageContainer > .printedPage {
+    page-break-after: always;
+    page-break-inside: avoid;
+
+    /* The wrapper always cover the whole page. */
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #printPageContainer > .printedPage canvas {
+    /* The intrinsic canvas / image size will make sure that we fit the page. */
+    max-width: 100%;
+    max-height: 100%;
+
+    direction: ltr;
+    display: block;
+  }
+}
