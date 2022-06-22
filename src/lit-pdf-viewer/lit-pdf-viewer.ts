@@ -20,9 +20,17 @@ import {
   PDFViewer,
   PDFFindController,
 } from 'pdfjs-dist/web/pdf_viewer';
+
+// Helpers
 import { removeAccents } from '../helpers/remove-accents';
+
+// Components
 import '../lit-pdf-toolbar/lit-pdf-toolbar';
 import '../lit-pdf-error/lit-pdf-error';
+
+// Services
+import PdfPrintService from '../helpers/print';
+
 import { IErrorInfo } from '../types/error';
 
 // @ts-ignore
@@ -40,7 +48,18 @@ const CMAP_PACKED = true;
 
 @customElement('lit-pdf-viewer')
 export class LitPdfViewer extends LitElement {
+  /**
+   * Url of the PDF to download and display
+   */
   @property({ type: String }) public src: string;
+
+  /**
+   * If the print src is different from the displayed pdf document.
+   * Setting this property will download another document with the specified printSrc and print it
+   */
+  @property({ type: String }) public printSrc: string;
+
+  @property({ type: String }) public token: string;
 
   @property({ type: Array }) public searchQueries: string[] = [];
 
@@ -136,6 +155,7 @@ export class LitPdfViewer extends LitElement {
           @previousPage=${this._handlePrevious}
           @nextPage=${this._handleNext}
           @pageChange=${this._handlePageChange}
+          @print=${this._handlePrint}
         >
           <lit-pdf-toolbar></lit-pdf-toolbar
         ></slot>
@@ -438,6 +458,26 @@ export class LitPdfViewer extends LitElement {
     if (input.value !== this.page.toString()) {
       input.value = this.page.toString();
     }
+  }
+
+  private async _handlePrint(e: CustomEvent): Promise<void> {
+    const toolbar = <HTMLElement>e.target;
+    toolbar.toggleAttribute('isPrintDisabled', true);
+
+    const printService = PdfPrintService.getInstance();
+    await printService.print({
+      printSrc: this.printSrc,
+      token: this.token,
+      pdfDocument: this._pdfDocument,
+    });
+
+    printService.onProgress = (progressData: { loaded: number; total: number }): void => {
+      const progress = progressData.loaded / progressData.total;
+      this.progress(progress);
+      this.loaded = progress === 1;
+    };
+
+    toolbar.toggleAttribute('isPrintDisabled', false);
   }
 
   private _handleToolbarConnected(e: CustomEvent): void {

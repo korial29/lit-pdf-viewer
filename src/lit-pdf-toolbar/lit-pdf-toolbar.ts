@@ -9,6 +9,8 @@ import style from './lit-pdf-toolbar.scss';
 export class LitPdfToolbar extends LitElement {
   @property({ type: Number }) public pageCount: number;
 
+  @property({ type: Boolean }) public isPrintDisabled: boolean;
+
   @query('#previous') private _previousPageEl: HTMLButtonElement;
 
   @query('#next') private _nextPageEl: HTMLButtonElement;
@@ -92,6 +94,15 @@ export class LitPdfToolbar extends LitElement {
         >
           <lit-icon icon="rotate-cw" alt="Rotate clockwise"></lit-icon>
         </button>
+        <button
+          class="toolbarButton print"
+          title="Print"
+          id="Print"
+          @click=${!this.isPrintDisabled && this._handlePrint}
+          ?disabled=${this.isPrintDisabled}
+        >
+          <lit-icon icon="print" alt="Print"></lit-icon>
+        </button>
       </section>
     `;
   }
@@ -135,5 +146,9 @@ export class LitPdfToolbar extends LitElement {
 
   private _handleRotateCcw(): void {
     this.dispatchEvent(new CustomEvent('rotateCcw', { bubbles: true }));
+  }
+
+  private _handlePrint(): void {
+    this.dispatchEvent(new CustomEvent('print', { bubbles: true }));
   }
 }
