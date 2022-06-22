@@ -460,9 +460,12 @@ export class LitPdfViewer extends LitElement {
     }
   }
 
-  private _handlePrint(): void {
+  private async _handlePrint(e: CustomEvent): Promise<void> {
+    const toolbar = <HTMLElement>e.target;
+    toolbar.toggleAttribute('isPrintDisabled', true);
+
     const printService = PdfPrintService.getInstance();
-    printService.print({
+    await printService.print({
       printSrc: this.printSrc,
       token: this.token,
       pdfDocument: this._pdfDocument,
@@ -473,6 +476,8 @@ export class LitPdfViewer extends LitElement {
       this.progress(progress);
       this.loaded = progress === 1;
     };
+
+    toolbar.toggleAttribute('isPrintDisabled', false);
   }
 
   private _handleToolbarConnected(e: CustomEvent): void {

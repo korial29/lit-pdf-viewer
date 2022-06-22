@@ -54,12 +54,12 @@ export default class PdfPrintService {
       }
 
       if (!hasChanged) {
-        this._print(ifrm);
+        await this._print(ifrm);
       } else {
         this._reinitProgress();
         await this._renderPdf({ printSrc, token, pdfDocument });
         this._copyCanvasInIframe(ifrm);
-        this._print(ifrm);
+        await this._print(ifrm);
       }
     }
   }
@@ -180,23 +180,28 @@ export default class PdfPrintService {
     ifrmBody.appendChild(this._printContainer);
   }
 
-  private _print(ifrm: HTMLIFrameElement): void {
-    if (!this._aborted) {
-      setTimeout(() => {
-        // eslint-disable-next-line dot-notation
-        if (window.frames['printPage'].print) {
+  private _print(ifrm: HTMLIFrameElement): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this._aborted) {
+        setTimeout(() => {
           // eslint-disable-next-line dot-notation
-          window.frames['printPage'].focus(); // Required for IE
-          // eslint-disable-next-line dot-notation
-          window.frames['printPage'].print();
-        } else {
-          // @ts-ignore
-          // eslint-disable-next-line no-param-reassign
-          ifrm.contentWindow.__container__ = ifrm;
-          ifrm.contentWindow.focus(); // Required for IE
-          ifrm.contentWindow.print();
-        }
-      }, 500);
-    }
+          if (window.frames['printPage'].print) {
+            // eslint-disable-next-line dot-notation
+            window.frames['printPage'].focus(); // Required for IE
+            // eslint-disable-next-line dot-notation
+            window.frames['printPage'].print();
+          } else {
+            // @ts-ignore
+            // eslint-disable-next-line no-param-reassign
+            ifrm.contentWindow.__container__ = ifrm;
+            ifrm.contentWindow.focus(); // Required for IE
+            ifrm.contentWindow.print();
+          }
+          resolve();
+        }, 500);
+      } else {
+        reject();
+      }
+    });
   }
 }
