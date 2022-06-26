@@ -11,6 +11,8 @@ export class LitPdfToolbar extends LitElement {
 
   @property({ type: Boolean }) public isPrintDisabled: boolean;
 
+  @property({ type: Boolean }) public isDownloadDisabled: boolean;
+
   @query('#previous') private _previousPageEl: HTMLButtonElement;
 
   @query('#next') private _nextPageEl: HTMLButtonElement;
@@ -103,6 +105,16 @@ export class LitPdfToolbar extends LitElement {
         >
           <lit-icon icon="print" alt="Print"></lit-icon>
         </button>
+
+        <button
+          class="toolbarButton download"
+          title="Download"
+          id="Download"
+          @click=${!this.isDownloadDisabled && this._handleDownload}
+          ?disabled=${this.isDownloadDisabled}
+        >
+          <lit-icon icon="download" alt="Download"></lit-icon>
+        </button>
       </section>
     `;
   }
@@ -150,5 +162,9 @@ export class LitPdfToolbar extends LitElement {
 
   private _handlePrint(): void {
     this.dispatchEvent(new CustomEvent('print', { bubbles: true }));
+  }
+
+  private _handleDownload(): void {
+    this.dispatchEvent(new CustomEvent('download', { bubbles: true }));
   }
 }
