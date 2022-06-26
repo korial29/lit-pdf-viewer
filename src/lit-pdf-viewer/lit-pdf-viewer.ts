@@ -10,6 +10,7 @@ import {
   version,
   build,
   PDFDocumentLoadingTask,
+  getFilenameFromUrl,
 } from 'pdfjs-dist';
 // eslint-disable-next-line import/no-unresolved
 import { IL10n } from 'pdfjs-dist/types/web/interfaces';
@@ -19,6 +20,7 @@ import {
   NullL10n,
   PDFViewer,
   PDFFindController,
+  DownloadManager,
 } from 'pdfjs-dist/web/pdf_viewer';
 
 // Helpers
@@ -103,6 +105,8 @@ export class LitPdfViewer extends LitElement {
 
   private _pdfFindController: PDFFindController;
 
+  private _downloadManager: DownloadManager;
+
   private _eventBus: EventBus;
 
   private _l10n: IL10n;
@@ -156,8 +160,9 @@ export class LitPdfViewer extends LitElement {
           @nextPage=${this._handleNext}
           @pageChange=${this._handlePageChange}
           @print=${this._handlePrint}
+          @download=${this._handleDownload}
         >
-          <lit-pdf-toolbar></lit-pdf-toolbar
+          <lit-pdf-toolbar isDownloadDisabled isPrintDisabled></lit-pdf-toolbar
         ></slot>
       </header>
 
@@ -245,6 +250,8 @@ export class LitPdfViewer extends LitElement {
       this._pdfLinkService.setDocument(this._pdfDocument);
       this._pdfFindController.setDocument(this._pdfDocument);
       this._toolbarEl.setAttribute('pageCount', `${this.pagesCount}`);
+      this._toolbarEl.toggleAttribute('isDownloadDisabled', false);
+      this._toolbarEl.toggleAttribute('isPrintDisabled', false);
       this.loaded = true;
     } catch (exception) {
       this._handleError(exception);
@@ -369,6 +376,8 @@ export class LitPdfViewer extends LitElement {
       eventBus: this._eventBus,
     });
 
+    this._downloadManager = new DownloadManager();
+
     /**
      * Mutliple phrase Search
      * Wrap PdfFindController._calculateRegExpMatch for multiple phrase search
@@ -388,6 +397,7 @@ export class LitPdfViewer extends LitElement {
       eventBus: this._eventBus,
       linkService: this._pdfLinkService,
       findController: this._pdfFindController,
+      downloadManager: this._downloadManager,
       l10n: this._l10n,
       useOnlyCssZoom: USE_ONLY_CSS_ZOOM,
     });
@@ -478,6 +488,17 @@ export class LitPdfViewer extends LitElement {
     };
 
     toolbar.toggleAttribute('isPrintDisabled', false);
+  }
+
+  private async _handleDownload(e: CustomEvent): Promise<void> {
+    const toolbar = <HTMLElement>e.target;
+    toolbar.toggleAttribute('isDownloadDisabled', true);
+
+    const data = await this._pdfDocument.getData();
+    const blob = new Blob([data], { type: 'application/pdf' });
+    this._downloadManager.download(blob, this.src, getFilenameFromUrl(this.src), 'download');
+
+    toolbar.toggleAttribute('isDownloadDisabled', false);
   }
 
   private _handleToolbarConnected(e: CustomEvent): void {
