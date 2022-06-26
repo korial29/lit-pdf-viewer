@@ -3,6 +3,7 @@
 :host {
   --page-margin: 1px auto -8px;
   --page-border: 9px solid transparent;
+  --highlight-color: #fff700;
 
   * {
     padding: 0;
@@ -81,7 +82,7 @@
     .highlight {
       margin: -1px;
       padding: 1px;
-      background-color: rgba(180, 0, 170, 1);
+      background-color: var(--highlight-color);
       border-radius: 4px;
     }
 
@@ -99,10 +100,6 @@
 
     .highlight.middle {
       border-radius: 0;
-    }
-
-    .highlight.selected {
-      background-color: rgba(0, 100, 0, 1);
     }
 
     &::-moz-selection {

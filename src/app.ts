@@ -7,14 +7,7 @@ export class LitApp extends LitElement {
   public render(): TemplateResult {
     return html` <lit-pdf-viewer
       src="pdf-example.pdf"
-      .searchQueries=${[
-        'php',
-        'java',
-        'fibre',
-        'application mobile',
-        'professionnelles',
-        'gagnant deux fois successives aux',
-      ]}
+      .searchQueries=${['java*', 'loop', 'Dynamic Languages', 'native code']}
     >
     </lit-pdf-viewer>`;
   }
