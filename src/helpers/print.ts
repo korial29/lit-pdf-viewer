@@ -130,6 +130,7 @@ export default class PdfPrintService {
 
       const pdfPage = await pdfDocument.getPage(pageNumber);
       const renderContext = {
+        canvas,
         canvasContext: ctx,
         transform: [PRINT_UNITS, 0, 0, PRINT_UNITS, 0, 0],
         viewport: pdfPage.getViewport({ scale: 1 }),

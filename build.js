@@ -21,8 +21,8 @@ esbuild
         resolveFrom: 'cwd',
         assets: [
           {
-            from: ['node_modules/pdfjs-dist/build/pdf.worker.min.js'],
-            to: ['dist/pdfjs-dist/build/pdf.worker.min.js'],
+            from: ['node_modules/pdfjs-dist/build/pdf.worker.min.mjs'],
+            to: ['dist/pdfjs-dist/build/pdf.worker.min.mjs'],
           },
           {
             from: ['node_modules/pdfjs-dist/cmaps/*'],
