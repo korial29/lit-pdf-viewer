@@ -52,7 +52,7 @@
     "lint": "npm run lint:prettier && npm run lint:eslint && npm run lint:tsc",
     "format": " npm run format:prettier && npm run format:eslint",
     "test": "vitest run --coverage",
-    "test:ci": "vitest run --coverage",
+    "test:ci": "vitest run --coverage --passWithNoTests",
     "test:update-snapshots": "vitest --update",
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch"

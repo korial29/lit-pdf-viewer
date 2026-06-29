@@ -1,0 +1,152 @@
+name: Release
+
+# Release automation (single-branch / trunk model on master).
+#
+# When a PR is merged into master, the version bump is derived from the PR's
+# release label (release:major / release:minor / release:patch). The actual
+# tag + npm publish + GitHub Release is gated behind the "release" environment,
+# so it is only *proposed* on merge and waits for a manual approval.
+#
+# A manual fallback is available via workflow_dispatch.
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump to apply'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Decide whether a release is needed and which bump to apply.
+  #    No approval needed here — it only computes metadata.
+  # ---------------------------------------------------------------------------
+  prepare:
+    name: prepare
+    runs-on: ubuntu-latest
+    # On PR events, only run for actually-merged PRs.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    outputs:
+      bump: ${{ steps.decide.outputs.bump }}
+      skip: ${{ steps.decide.outputs.skip }}
+    steps:
+      - name: Determine bump from label or input
+        id: decide
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (context.eventName === 'workflow_dispatch') {
+              const bump = context.payload.inputs.bump;
+              core.setOutput('bump', bump);
+              core.setOutput('skip', 'false');
+              core.info(`Manual dispatch → ${bump}`);
+              return;
+            }
+
+            const labels = context.payload.pull_request.labels.map(l => l.name);
+            const map = {
+              'release:major': 'major',
+              'release:minor': 'minor',
+              'release:patch': 'patch',
+            };
+            const matched = labels.filter(l => l in map || l === 'release:skip');
+
+            if (matched.includes('release:skip') || matched.length === 0) {
+              core.setOutput('skip', 'true');
+              core.setOutput('bump', '');
+              core.info('No release label (or release:skip) → skipping release.');
+              return;
+            }
+            const bump = map[matched[0]];
+            core.setOutput('bump', bump);
+            core.setOutput('skip', 'false');
+            core.info(`PR label → ${bump}`);
+
+  # ---------------------------------------------------------------------------
+  # 2. Bump, build, tag, publish and create the GitHub Release.
+  #    Protected by the "release" environment (manual approval).
+  # ---------------------------------------------------------------------------
+  release:
+    name: release
+    needs: prepare
+    if: needs.prepare.outputs.skip == 'false'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          # A PAT (added to the branch-protection bypass list) lets the bump
+          # commit be pushed back to the protected master branch.
+          # Falls back to GITHUB_TOKEN if RELEASE_TOKEN is not set.
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Bump version (${{ needs.prepare.outputs.bump }})
+        id: bump
+        run: |
+          NEW_VERSION=$(npm version ${{ needs.prepare.outputs.bump }} --no-git-tag-version)
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Bumped to ${NEW_VERSION}"
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit version bump and tag
+        run: |
+          VERSION="${{ steps.bump.outputs.version }}"
+          git add package.json package-lock.json
+          git commit -m "🔖 ${VERSION#v}"
+          git tag -a "${VERSION}" -m "Release ${VERSION}"
+          git push origin master
+          git push origin "${VERSION}"
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.bump.outputs.version }}"
+          gh release create "${VERSION}" \
+            --title "${VERSION}" \
+            --generate-notes \
+            --target master
+
+      - name: Job summary
+        run: |
+          echo "### Released ${{ steps.bump.outputs.version }} :rocket:" >> "$GITHUB_STEP_SUMMARY"
+          echo "- npm: published" >> "$GITHUB_STEP_SUMMARY"
+          echo "- GitHub Release: created" >> "$GITHUB_STEP_SUMMARY"
