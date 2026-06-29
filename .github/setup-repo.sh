@@ -59,6 +59,4 @@ protect_master
 echo
 echo "Done. Remaining manual steps (see .github/CI.md):"
 echo "  1. Create the 'release' GitHub Environment with yourself as required reviewer."
-echo "  2. Add the NPM_TOKEN secret (npm publish)."
-echo "  3. (Recommended) Add a RELEASE_TOKEN PAT secret and allow it to bypass master protection,"
-echo "     so the release bump commit and the back-merge PR can be pushed."
+echo "  2. Add the NPM_TOKEN secret (npm publish) — the only secret required."

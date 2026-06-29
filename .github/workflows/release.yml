@@ -91,10 +91,6 @@ jobs:
         with:
           ref: master
           fetch-depth: 0
-          # A PAT (added to the branch-protection bypass list) lets the bump
-          # commit be pushed back to the protected master branch.
-          # Falls back to GITHUB_TOKEN if RELEASE_TOKEN is not set.
-          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -111,23 +107,32 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Source of truth for the released version is the latest git tag.
+      # Fall back to package.json the very first time (no tag yet).
       - name: Bump version (${{ needs.prepare.outputs.bump }})
         id: bump
         run: |
+          LATEST=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+          if [ -z "${LATEST}" ]; then
+            CURRENT=$(node -p "require('./package.json').version")
+          else
+            CURRENT="${LATEST#v}"
+          fi
+          npm pkg set version="${CURRENT}"
           NEW_VERSION=$(npm version ${{ needs.prepare.outputs.bump }} --no-git-tag-version)
           echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Bumped to ${NEW_VERSION}"
+          echo "Base ${CURRENT} → ${NEW_VERSION}"
 
       - name: Build
         run: npm run build
 
-      - name: Commit version bump and tag
+      # Tags are not subject to branch protection, so GITHUB_TOKEN is enough.
+      # The version bump is intentionally NOT committed back to the protected
+      # master branch; the tag + the published npm package carry the version.
+      - name: Tag release
         run: |
           VERSION="${{ steps.bump.outputs.version }}"
-          git add package.json package-lock.json
-          git commit -m "🔖 ${VERSION#v}"
           git tag -a "${VERSION}" -m "Release ${VERSION}"
-          git push origin master
           git push origin "${VERSION}"
 
       - name: Publish to npm
