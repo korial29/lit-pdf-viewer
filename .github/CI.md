@@ -48,7 +48,7 @@ Then, in the GitHub UI:
 1. **Settings → Environments →** create `release` and add yourself as a *required reviewer*.
    This is what turns the release into a *proposal* awaiting approval.
 2. **Settings → Secrets and variables → Actions:**
-   - `NPM_TOKEN` — npm automation token, for `npm publish`. (Only secret required.)
+   - `NPM_PUBLISH_TOKEN` — npm automation token, for `npm publish`. (Only secret required.)
 
 ## Day-to-day
 

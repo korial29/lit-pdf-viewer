@@ -59,4 +59,4 @@ protect_master
 echo
 echo "Done. Remaining manual steps (see .github/CI.md):"
 echo "  1. Create the 'release' GitHub Environment with yourself as required reviewer."
-echo "  2. Add the NPM_TOKEN secret (npm publish) — the only secret required."
+echo "  2. Add the NPM_PUBLISH_TOKEN secret (npm publish) — the only secret required."
