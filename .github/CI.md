@@ -23,8 +23,13 @@ Exposes the **`require-release-label`** status check.
 When a PR is merged into `master`:
 1. **prepare** reads the release label and computes the bump (skips on `release:skip` or no label).
 2. **release** waits for manual approval via the **`release`** environment, then:
-   bumps the version, builds, commits the bump to `master`, tags `vX.Y.Z`,
-   publishes to npm (`--access public`), and creates the GitHub Release with auto-generated notes.
+   computes the next version from the latest git tag, builds, publishes to npm
+   (`--access public`), pushes the `vX.Y.Z` tag and creates the GitHub Release.
+
+The released version lives in the **git tag** and the **published npm package**, not
+in a commit on `master`. Nothing is pushed to the protected `master` branch, so no
+PAT or bypass rule is needed — `GITHUB_TOKEN` can push a tag. `package.json` on
+`master` is only a baseline; the tag is the source of truth for the next bump.
 
 A manual `workflow_dispatch` (with a `patch`/`minor`/`major` input) is available as a fallback.
 
@@ -43,11 +48,7 @@ Then, in the GitHub UI:
 1. **Settings → Environments →** create `release` and add yourself as a *required reviewer*.
    This is what turns the release into a *proposal* awaiting approval.
 2. **Settings → Secrets and variables → Actions:**
-   - `NPM_TOKEN` — npm automation token, for `npm publish`.
-   - `RELEASE_TOKEN` *(recommended)* — a fine-grained PAT with `contents: write`.
-     Add it to the *bypass* list in master's branch protection so the release bump
-     commit can be pushed. Without it the workflow falls back to `GITHUB_TOKEN`,
-     which cannot push to a protected branch.
+   - `NPM_TOKEN` — npm automation token, for `npm publish`. (Only secret required.)
 
 ## Day-to-day
 
