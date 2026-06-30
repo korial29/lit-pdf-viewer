@@ -46,8 +46,7 @@ export class LitPdfError extends LitElement {
           </section>
         </div>
         <textarea class="errorMoreInfo" id="errorMoreInfo" hidden="true" readonly="readonly">
-${this.errorMoreInfo}</textarea
-        >
+${this.errorMoreInfo}</textarea>
       </div>
     `;
   }

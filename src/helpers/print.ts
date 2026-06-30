@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import { PDFDocumentProxy, getDocument, PixelsPerInch } from 'pdfjs-dist';
 // @ts-ignore
 import printStyle from './print.scss';
@@ -30,7 +29,7 @@ export default class PdfPrintService {
     return PdfPrintService._instance;
   }
 
-  public onProgress(progressData: { loaded: number; total: number }): void {
+  public onProgress(_progressData: { loaded: number; total: number }): void {
     return null;
   }
 
@@ -89,7 +88,6 @@ export default class PdfPrintService {
 
   private _renderPages(pdfDocument: PDFDocumentProxy, pageCount: number): Promise<void> {
     const renderNextPage = (resolve, reject): Promise<void> => {
-      // eslint-disable-next-line no-plusplus
       if (++this._currentPage >= pageCount) {
         this.onProgress({ loaded: pageCount, total: pageCount });
         resolve();
@@ -185,15 +183,13 @@ export default class PdfPrintService {
     return new Promise((resolve, reject) => {
       if (!this._aborted) {
         setTimeout(() => {
-          // eslint-disable-next-line dot-notation
           if (window.frames['printPage'].print) {
-            // eslint-disable-next-line dot-notation
             window.frames['printPage'].focus(); // Required for IE
-            // eslint-disable-next-line dot-notation
+
             window.frames['printPage'].print();
           } else {
             // @ts-ignore
-            // eslint-disable-next-line no-param-reassign
+
             ifrm.contentWindow.__container__ = ifrm;
             ifrm.contentWindow.focus(); // Required for IE
             ifrm.contentWindow.print();

@@ -377,7 +377,6 @@ export class LitPdfViewer extends LitElement {
       newScale = Number((newScale * DEFAULT_SCALE_DELTA).toFixed(2));
       newScale = Math.ceil(newScale * 10) / 10;
       newScale = Math.min(MAX_SCALE, newScale);
-      // eslint-disable-next-line no-plusplus, no-param-reassign
     } while (--ticks && newScale < MAX_SCALE);
     this._pdfViewer.currentScaleValue = newScale.toString();
   }
@@ -388,7 +387,6 @@ export class LitPdfViewer extends LitElement {
       newScale = Number((newScale / DEFAULT_SCALE_DELTA).toFixed(2));
       newScale = Math.floor(newScale * 10) / 10;
       newScale = Math.max(MIN_SCALE, newScale);
-      // eslint-disable-next-line no-plusplus, no-param-reassign
     } while (--ticks && newScale > MIN_SCALE);
     this._pdfViewer.currentScaleValue = newScale.toString();
   }
