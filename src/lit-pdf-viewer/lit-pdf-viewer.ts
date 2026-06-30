@@ -4,24 +4,20 @@ import {
   getDocument,
   GlobalWorkerOptions,
   InvalidPDFException,
-  MissingPDFException,
+  ResponseException,
   PDFDocumentProxy,
-  UnexpectedResponseException,
   version,
   build,
   PDFDocumentLoadingTask,
   getFilenameFromUrl,
 } from 'pdfjs-dist';
-// eslint-disable-next-line import/no-unresolved
-import { IL10n } from 'pdfjs-dist/types/web/interfaces';
 import {
   EventBus,
   PDFLinkService,
-  NullL10n,
   PDFViewer,
   PDFFindController,
   DownloadManager,
-} from 'pdfjs-dist/web/pdf_viewer';
+} from 'pdfjs-dist/web/pdf_viewer.mjs';
 
 // Helpers
 import { removeAccents } from '../helpers/remove-accents';
@@ -38,12 +34,11 @@ import { IErrorInfo } from '../types/error';
 // @ts-ignore
 import style from './lit-pdf-viewer.scss';
 
-GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.min.js';
+GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.min.mjs';
 
 const DEFAULT_SCALE_DELTA = 1.1;
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 10.0;
-const USE_ONLY_CSS_ZOOM = true;
 const MAX_IMAGE_SIZE = 1024 * 1024;
 const CMAP_URL = 'pdfjs-dist/cmaps/';
 const CMAP_PACKED = true;
@@ -109,11 +104,7 @@ export class LitPdfViewer extends LitElement {
 
   private _eventBus: EventBus;
 
-  private _l10n: IL10n;
-
   private _loadingTaskPromise: Promise<PDFDocumentProxy | void>;
-
-  private _orginalCalculatMatch: PDFFindController['_calculateRegExpMatch'];
 
   public static get styles(): CSSResult[] {
     return [style];
@@ -136,7 +127,7 @@ export class LitPdfViewer extends LitElement {
       super.connectedCallback();
     }
 
-    window.addEventListener('resize', () => this._handleWindowResise());
+    window.addEventListener('resize', this._handleWindowResise);
   }
 
   public disconnectedCallback(): void {
@@ -144,7 +135,7 @@ export class LitPdfViewer extends LitElement {
       super.disconnectedCallback();
     }
 
-    window.removeEventListener('resize', () => this._handleWindowResise());
+    window.removeEventListener('resize', this._handleWindowResise);
   }
 
   public render(): TemplateResult {
@@ -261,70 +252,45 @@ export class LitPdfViewer extends LitElement {
     return this._pdfDocument;
   }
 
-  private async _handleError(
-    exception: InvalidPDFException | MissingPDFException | UnexpectedResponseException,
-  ): Promise<void> {
+  private _handleError(exception: InvalidPDFException | ResponseException): void {
     const message = exception?.message;
-    const { _l10n } = this;
-    let loadingErrorMessage: Promise<string>;
+    let loadingErrorMessage: string;
 
     if (exception instanceof InvalidPDFException) {
-      // change error message also for other builds
-      loadingErrorMessage = _l10n.get('invalid_file_error', null, 'Invalid or corrupted PDF file.');
-    } else if (exception instanceof MissingPDFException) {
-      // special message for missing PDFs
-      loadingErrorMessage = _l10n.get('missing_file_error', null, 'Missing PDF file.');
-    } else if (exception instanceof UnexpectedResponseException) {
-      loadingErrorMessage = _l10n.get(
-        'unexpected_response_error',
-        null,
-        'Unexpected server response.',
-      );
+      loadingErrorMessage = 'Invalid or corrupted PDF file.';
+    } else if (exception instanceof ResponseException && exception.missing) {
+      // special message for missing PDFs (e.g. HTTP 404)
+      loadingErrorMessage = 'Missing PDF file.';
+    } else if (exception instanceof ResponseException) {
+      loadingErrorMessage = 'Unexpected server response.';
     } else {
-      loadingErrorMessage = _l10n.get(
-        'loading_error',
-        null,
-        'An error occurred while loading the PDF.',
-      );
+      loadingErrorMessage = 'An error occurred while loading the PDF.';
     }
 
-    const msg = await loadingErrorMessage;
-    this.error(msg, <IErrorInfo>{ message });
+    this.error(loadingErrorMessage, <IErrorInfo>{ message });
   }
 
-  private async error(message: string, moreInfo: IErrorInfo): Promise<void> {
-    const { _l10n } = this;
-    const moreInfoText = [
-      _l10n.get(
-        'error_version_info',
-        { version: version || '?', build: build || '?' },
-        'PDF.js v{{version}} (build: {{build}})',
-      ),
-    ];
+  private error(message: string, moreInfo: IErrorInfo): void {
+    const moreInfoText = [`PDF.js v${version || '?'} (build: ${build || '?'})`];
 
     this._errorMessage = message;
     this._toggleErrorPanel({ open: true });
 
     if (moreInfo) {
-      moreInfoText.push(
-        _l10n.get('error_message', { message: moreInfo.message }, 'Message: {{message}}'),
-      );
+      moreInfoText.push(`Message: ${moreInfo.message}`);
       if (moreInfo.stack) {
-        moreInfoText.push(_l10n.get('error_stack', { stack: moreInfo.stack }, 'Stack: {{stack}}'));
+        moreInfoText.push(`Stack: ${moreInfo.stack}`);
       } else {
         if (moreInfo.filename) {
-          moreInfoText.push(_l10n.get('error_file', { file: moreInfo.filename }, 'File: {{file}}'));
+          moreInfoText.push(`File: ${moreInfo.filename}`);
         }
         if (moreInfo.lineNumber) {
-          moreInfoText.push(
-            _l10n.get('error_line', { line: moreInfo.lineNumber }, 'Line: {{line}}'),
-          );
+          moreInfoText.push(`Line: ${moreInfo.lineNumber}`);
         }
       }
     }
 
-    const parts = await Promise.all(moreInfoText);
-    this._errorMoreInfo = parts.join('\n');
+    this._errorMoreInfo = moreInfoText.join('\n');
   }
 
   private _toggleErrorPanel({ open }: { open: boolean }): void {
@@ -378,28 +344,13 @@ export class LitPdfViewer extends LitElement {
 
     this._downloadManager = new DownloadManager();
 
-    /**
-     * Mutliple phrase Search
-     * Wrap PdfFindController._calculateRegExpMatch for multiple phrase search
-     */
-    if (this.searchQueries?.length) {
-      this._orginalCalculatMatch = this._pdfFindController._calculateRegExpMatch;
-      this._pdfFindController._calculateRegExpMatch = (...args): void =>
-        this._multiPhraseSearch(...args);
-    }
-
-    this._l10n = NullL10n;
-
     this._pdfViewer = new PDFViewer({
       container: this._viewerContainer,
       removePageBorders: true,
-      renderer: null,
       eventBus: this._eventBus,
       linkService: this._pdfLinkService,
       findController: this._pdfFindController,
       downloadManager: this._downloadManager,
-      l10n: this._l10n,
-      useOnlyCssZoom: USE_ONLY_CSS_ZOOM,
     });
     this._pdfLinkService.setViewer(this._pdfViewer);
 
@@ -495,8 +446,7 @@ export class LitPdfViewer extends LitElement {
     toolbar.toggleAttribute('isDownloadDisabled', true);
 
     const data = await this._pdfDocument.getData();
-    const blob = new Blob([data], { type: 'application/pdf' });
-    this._downloadManager.download(blob, this.src, getFilenameFromUrl(this.src), 'download');
+    this._downloadManager.download(data, this.src, getFilenameFromUrl(this.src));
 
     toolbar.toggleAttribute('isDownloadDisabled', false);
   }
@@ -529,76 +479,19 @@ export class LitPdfViewer extends LitElement {
       this._eventBus.dispatch('find', {
         source: this,
         type: '',
-        query: this._searchQueriesNormalized[0],
+        // Since v6 the find controller natively supports an array of queries
+        // for multi-phrase search, replacing the previous internal hack.
+        query: this._searchQueriesNormalized,
         caseSensitive: false,
         entireWord: this.entireWord,
-        phraseSearch: true,
         findPrevious: false,
         highlightAll: true,
         matchDiacritics: false,
-        allowMatchScroll: false,
       });
     }, 500);
   }
 
   private _removeAccents(): void {
     this._searchQueriesNormalized = this.searchQueries.map(query => removeAccents(query));
-  }
-
-  private _multiPhraseSearch(
-    initalquery: string,
-    entireWord: boolean,
-    pageIndex: number,
-    pageContent: string,
-  ): void {
-    this._searchQueriesNormalized.forEach(rawquery => {
-      const hasDiacritics = this._pdfFindController._hasDiacritics[pageIndex];
-      const [isUnicode, query] = this._pdfFindController._convertToRegExpString(
-        rawquery,
-        hasDiacritics,
-      );
-      const flags = `g${isUnicode ? 'u' : ''}${
-        this._pdfFindController._state.caseSensitive ? '' : 'i'
-      }`;
-      const queryRegex = new RegExp(query, flags);
-
-      // Save previous matches
-      const savedMatches = [];
-      this._pdfFindController._pageMatches[pageIndex]?.forEach((match: number, index: number) => {
-        savedMatches.push({
-          match,
-          length: this._pdfFindController._pageMatchesLength[pageIndex][index],
-        });
-      });
-
-      // Call pdfjs original CalculatMatch function
-      this._orginalCalculatMatch.call(
-        this._pdfFindController,
-        queryRegex,
-        entireWord,
-        pageIndex,
-        pageContent,
-      );
-
-      // Apply previous matches to the new one
-      this._pdfFindController._pageMatches[pageIndex]?.forEach((match: number, index: number) => {
-        savedMatches.push({
-          match,
-          length: this._pdfFindController._pageMatchesLength[pageIndex][index],
-        });
-      });
-
-      // Search matches must be ordered before highlighting
-      if (savedMatches.length) {
-        savedMatches.sort((a, b) => a.match - b.match);
-
-        this._pdfFindController._pageMatches[pageIndex].length = 0;
-        this._pdfFindController._pageMatchesLength[pageIndex].length = 0;
-        savedMatches.forEach((item: { match: number; length: number }) => {
-          this._pdfFindController._pageMatches[pageIndex].push(item.match);
-          this._pdfFindController._pageMatchesLength[pageIndex].push(item.length);
-        });
-      }
-    });
   }
 }

@@ -1,0 +1,7 @@
+node_modules
+dist
+build
+www/src
+www/pdfjs-dist
+www/fonts
+www/style
