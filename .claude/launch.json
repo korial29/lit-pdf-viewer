@@ -3,9 +3,10 @@
   "configurations": [
     {
       "name": "lit-pdf-viewer",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["start"],
-      "port": 8000
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["start-dev.sh"],
+      "port": 5173,
+      "autoPort": true
     }
   ]
 }
