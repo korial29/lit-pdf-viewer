@@ -14,17 +14,21 @@ function litScssPlugin() {
     name: 'lit-scss',
     enforce: 'pre',
     resolveId(id, importer) {
-      if (!id.endsWith('.scss') || !importer) return null;
+      if (!id.endsWith('.scss') || !importer) {
+        return null;
+      }
       const cleanImporter = importer.startsWith(VIRTUAL_PREFIX)
-        ? importer.slice(VIRTUAL_PREFIX.length) + '.scss'
+        ? `${importer.slice(VIRTUAL_PREFIX.length)}.scss`
         : importer;
       const abs = resolve(dirname(cleanImporter), id);
       // Strip .scss so vite:css doesn't re-process this virtual module
       return VIRTUAL_PREFIX + abs.slice(0, -5);
     },
     load(id) {
-      if (!id.startsWith(VIRTUAL_PREFIX)) return null;
-      const filePath = id.slice(VIRTUAL_PREFIX.length) + '.scss';
+      if (!id.startsWith(VIRTUAL_PREFIX)) {
+        return null;
+      }
+      const filePath = `${id.slice(VIRTUAL_PREFIX.length)}.scss`;
       const source = readFileSync(filePath, 'utf-8');
       const result = compileString(source, {
         url: new URL(`file://${filePath}`),

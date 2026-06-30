@@ -127,7 +127,7 @@ export class LitPdfViewer extends LitElement {
       super.connectedCallback();
     }
 
-    window.addEventListener('resize', () => this._handleWindowResise());
+    window.addEventListener('resize', this._handleWindowResise);
   }
 
   public disconnectedCallback(): void {
@@ -135,7 +135,7 @@ export class LitPdfViewer extends LitElement {
       super.disconnectedCallback();
     }
 
-    window.removeEventListener('resize', () => this._handleWindowResise());
+    window.removeEventListener('resize', this._handleWindowResise);
   }
 
   public render(): TemplateResult {
