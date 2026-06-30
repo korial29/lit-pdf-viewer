@@ -26,7 +26,7 @@
     "@typescript-eslint/parser": "^5.5.0",
     "@vitest/ui": "^0.8.1",
     "c8": "^7.11.0",
-    "esbuild": "^0.25.12",
+    "esbuild": "^0.27.7",
     "esbuild-node-externals": "^1.4.1",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-sass-plugin": "^3.7.0",
