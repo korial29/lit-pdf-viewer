@@ -5,9 +5,22 @@
   --page-border: 9px solid transparent;
   --highlight-color: rgb(255 247 0 / 0.4);
 
+  // Fill the space the host is given and lay the toolbar + scroll area out as
+  // a column. The consumer is responsible for sizing the host (e.g. height).
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
   * {
     padding: 0;
     margin: 0;
+  }
+
+  header {
+    flex: 0 0 auto;
   }
 
   section {
@@ -20,15 +33,23 @@
     font-size: 2rem;
   }
 
+  // The wrapper grows to fill the space between the toolbar and the bottom of
+  // the host. Allow it to shrink below its content (min-height: 0) so it — and
+  // only it — scrolls, instead of overflowing the host and creating a second
+  // scrollbar.
+  .viewerWrapper {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+  }
+
+  // pdf.js requires its scroll container to be absolutely positioned; here it
+  // fills the (relatively positioned) wrapper.
   #viewerContainer {
     position: absolute;
+    inset: 0;
     overflow: auto;
-    inset: 34px 0 0 0 !important;
-    width: 100%;
-    top: 5rem;
-    bottom: 4rem;
-    left: 0;
-    right: 0;
   }
 
   .pdfViewer {

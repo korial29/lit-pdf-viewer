@@ -76,6 +76,21 @@ class MyApp extends LitElement {
 }
 ```
 
+### Sizing
+
+The component fills the height of its host, so give the host a height. Without
+one it collapses and nothing shows.
+
+```css
+lit-pdf-viewer {
+  display: block;
+  height: 100vh; /* or 100%, a fixed height, a flex/grid track… */
+}
+```
+
+On small screens the toolbar's rotation buttons collapse into a `⋯` overflow
+menu so the whole bar fits in one row.
+
 ---
 
 ## Properties

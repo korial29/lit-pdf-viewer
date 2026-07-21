@@ -1,6 +1,7 @@
 import { CSSResult, html, TemplateResult, LitElement } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import '../lit-icon/lit-icon';
+import '../lit-tooltip/lit-tooltip';
 
 // @ts-ignore
 import style from './lit-pdf-toolbar.scss';
@@ -79,27 +80,26 @@ export class LitPdfToolbar extends LitElement {
 
       <span class="separator"></span>
 
-      <section class="container">
+      <section class="container actions">
+        <!-- Secondary actions: inline on desktop, hidden on small screens where
+             they move into the "..." overflow menu below. -->
         <button
-          class="toolbarButton rotateCcw"
+          class="toolbarButton rotateCcw inlineOnly"
           title="Rotate counter clockwise"
-          id="RotateCcw"
           @click=${this._handleRotateCcw}
         >
           <lit-icon icon="rotate-ccw" alt="Rotate counter clockwise"></lit-icon>
         </button>
         <button
-          class="toolbarButton rotateCw"
+          class="toolbarButton rotateCw inlineOnly"
           title="Rotate clockwise"
-          id="RotateCw"
           @click=${this._handleRotateCw}
         >
           <lit-icon icon="rotate-cw" alt="Rotate clockwise"></lit-icon>
         </button>
         <button
-          class="toolbarButton print"
+          class="toolbarButton print inlineOnly"
           title="Print"
-          id="Print"
           @click=${!this.isPrintDisabled && this._handlePrint}
           ?disabled=${this.isPrintDisabled}
         >
@@ -107,14 +107,58 @@ export class LitPdfToolbar extends LitElement {
         </button>
 
         <button
-          class="toolbarButton download"
+          class="toolbarButton download inlineOnly"
           title="Download"
-          id="Download"
           @click=${!this.isDownloadDisabled && this._handleDownload}
           ?disabled=${this.isDownloadDisabled}
         >
           <lit-icon icon="download" alt="Download"></lit-icon>
         </button>
+
+        <!-- On small screens the secondary actions collapse into this "..."
+             overflow menu, pinned to the far right. It is hidden on desktop. -->
+        <lit-tooltip class="moreTooltip" align="right">
+          <button
+            slot="anchor"
+            class="toolbarButton more"
+            title="More"
+            aria-label="More"
+            aria-haspopup="true"
+          >
+            <span class="moreIcon" aria-hidden="true">⋯</span>
+          </button>
+
+          <button
+            class="toolbarButton rotateCcw"
+            title="Rotate counter clockwise"
+            @click=${this._handleRotateCcw}
+          >
+            <lit-icon icon="rotate-ccw" alt="Rotate counter clockwise"></lit-icon>
+          </button>
+          <button
+            class="toolbarButton rotateCw"
+            title="Rotate clockwise"
+            @click=${this._handleRotateCw}
+          >
+            <lit-icon icon="rotate-cw" alt="Rotate clockwise"></lit-icon>
+          </button>
+          <button
+            class="toolbarButton print"
+            title="Print"
+            @click=${!this.isPrintDisabled && this._handlePrint}
+            ?disabled=${this.isPrintDisabled}
+          >
+            <lit-icon icon="print" alt="Print"></lit-icon>
+          </button>
+          <button
+            class="toolbarButton download"
+            title="Download"
+            @click=${!this.isDownloadDisabled && this._handleDownload}
+            ?disabled=${this.isDownloadDisabled}
+          >
+            <lit-icon icon="download" alt="Download"></lit-icon>
+          </button>
+        </lit-tooltip>
       </section>
     `;
   }

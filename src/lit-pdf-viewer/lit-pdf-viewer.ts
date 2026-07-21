@@ -157,8 +157,10 @@ export class LitPdfViewer extends LitElement {
         ></slot>
       </header>
 
-      <div id="viewerContainer">
-        <div id="viewer" class="pdfViewer"></div>
+      <div class="viewerWrapper">
+        <div id="viewerContainer">
+          <div id="viewer" class="pdfViewer"></div>
+        </div>
       </div>
 
       <slot name="loading">

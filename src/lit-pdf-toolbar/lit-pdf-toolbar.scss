@@ -13,6 +13,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  // Spacing is driven entirely by `gap` (never per-element margins) so every
+  // slot — button, field, separator or the "..." menu — is evenly spaced.
+  // `gap` here separates the groups/separators; `.container` gap separates the
+  // buttons within a group.
+  gap: 16px;
   height: 34px;
   background-color: var(--toolbar-color);
   border-bottom: var(--toolbar-border);
@@ -22,7 +27,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 16px;
+    gap: 8px;
+  }
+
+  // The "..." overflow menu is only shown on small screens (see media query);
+  // on wide screens the rotation buttons sit inline in the toolbar instead.
+  .moreTooltip {
+    display: none;
+  }
+
+  .moreIcon {
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: 1px;
   }
 
   .separator {
@@ -55,12 +72,6 @@
     }
   }
 
-  .toolbarButton,
-  .toolbarField,
-  .pageCount {
-    margin: 0 4px;
-  }
-
   .pageNumber {
     outline: none;
     border: 0;
@@ -70,5 +81,57 @@
 
   .pageCount {
     font-size: 0.8rem;
+  }
+
+  // On small screens the row can't hold every button, so we move the secondary
+  // actions (rotate + print + download) into the "..." overflow menu and
+  // enlarge the remaining controls to comfortable ~44px touch targets
+  // (Apple HIG minimum).
+  @media (max-width: 600px) {
+    --button-width: 44px;
+    --button-height: 44px;
+
+    gap: 8px;
+    height: 48px;
+
+    .container {
+      gap: 6px;
+    }
+
+    // Hide the inline secondary buttons; they live in the "..." menu instead.
+    .toolbarButton.inlineOnly {
+      display: none;
+    }
+
+    .moreTooltip {
+      display: inline-flex;
+    }
+
+    // Grow the page-number field to match the taller touch targets.
+    .pageNumber {
+      height: 34px;
+      width: 44px;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .pageCount {
+      font-size: 1rem;
+    }
+  }
+
+  // Very narrow phones (≈320px) can't fit the whole row of 44px targets; shrink
+  // them a little so the bar still fits rather than bringing back a horizontal
+  // scrollbar. Mainstream widths (360px+) keep the full 44px targets above.
+  @media (max-width: 359px) {
+    --button-width: 40px;
+    --button-height: 40px;
+
+    height: 44px;
+
+    .pageNumber {
+      height: 30px;
+      width: 40px;
+    }
   }
 }
