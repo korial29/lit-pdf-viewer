@@ -44,8 +44,15 @@ function litScssPlugin() {
   };
 }
 
+const isBuildingDemo = process.env.BUILD_DEMO === 'true';
+
 export default defineConfig({
-  build: {
+  build: isBuildingDemo ? {
+    outDir: 'dist-demo',
+    rollupOptions: {
+      input: resolve(__dirname, 'www/index.html'),
+    },
+  } : {
     lib: {
       entry: resolve(__dirname, 'src/index.js'),
       formats: ['es'],

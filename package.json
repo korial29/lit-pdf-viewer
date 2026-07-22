@@ -47,6 +47,7 @@
   "scripts": {
     "start": "cp -r node_modules/pdfjs-dist www && cp -r assets/fonts www && cp -r assets/style www/style && vite www",
     "build": "vite build",
+    "build:demo": "BUILD_DEMO=true vite build",
     "lint:eslint": "eslint .",
     "format:eslint": "eslint . --fix",
     "lint:prettier": "prettier --check \"**/*.(js|ts)\"",
