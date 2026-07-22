@@ -5,16 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="Description" content="Put your description here.">
   <link rel="stylesheet" href="style/font.css">
-  <script type="importmap">
-  {
-    "imports": {
-      "lit": "https://cdn.jsdelivr.net/gh/lit/lit@3/index.js",
-      "lit/": "https://cdn.jsdelivr.net/gh/lit/lit@3/",
-      "pdfjs-dist/build/pdf": "./pdfjs-dist/build/pdf.mjs",
-      "pdfjs-dist/build/pdf.worker": "./pdfjs-dist/build/pdf.worker.mjs"
-    }
-  }
-  </script>
   <style>
     html, body {
       margin: 0;
@@ -29,7 +19,9 @@
 </head>
 <body>
   <lit-app></lit-app>
-  <script type="module" src="./index.js"></script>
+  <script type="module">
+    import * as module from 'https://cdn.jsdelivr.net/npm/lit-pdf-viewer@1.1.0/dist/index.mjs';
+  </script>
 </body>
 
 </html>
