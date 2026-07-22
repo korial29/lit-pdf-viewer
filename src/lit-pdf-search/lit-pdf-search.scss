@@ -1,0 +1,72 @@
+@import '../../assets/style/colors.scss';
+
+:host {
+  --button-width: 26px;
+  --button-height: 26px;
+
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 12px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-top: 6px;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: $shadow;
+  z-index: 500;
+  box-sizing: border-box;
+}
+
+:host([open]) {
+  display: flex;
+}
+
+lit-input {
+  --input-height: 30px;
+  width: 170px;
+  margin: 16px;
+}
+
+.matchCount {
+  font-size: 0.75rem;
+  color: #{map-get($primary-color-2, '75')};
+  white-space: nowrap;
+}
+
+.searchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-width);
+  height: var(--button-height);
+  border: 0;
+  outline: 0;
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &:hover {
+    lit-icon {
+      color: #{map-get($primary-color, 'medium')};
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  :host {
+    right: 6px;
+    left: 6px;
+  }
+
+  lit-input {
+    width: auto;
+    flex: 1 1 auto;
+  }
+}

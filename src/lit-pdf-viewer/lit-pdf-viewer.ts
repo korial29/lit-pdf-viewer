@@ -17,6 +17,7 @@ import {
   PDFViewer,
   PDFFindController,
   DownloadManager,
+  FindState,
 } from 'pdfjs-dist/web/pdf_viewer.mjs';
 
 // Helpers
@@ -25,6 +26,7 @@ import { removeAccents } from '../helpers/remove-accents';
 // Components
 import '../lit-pdf-toolbar/lit-pdf-toolbar';
 import '../lit-pdf-error/lit-pdf-error';
+import '../lit-pdf-search/lit-pdf-search';
 
 // Services
 import PdfPrintService from '../helpers/print';
@@ -70,9 +72,29 @@ export class LitPdfViewer extends LitElement {
 
   @property({ type: Boolean, reflect: true }) public loaded: boolean;
 
+  /**
+   * Shows the floating find-in-page bar automatically when set (it also
+   * shows automatically whenever `searchQueries` is non-empty). It can also
+   * be opened at any time with the Ctrl+F / Cmd+F shortcut.
+   */
+  @property({ type: Boolean, reflect: true }) public isSearchBarDisplayed = false;
+
   @query('#viewerContainer') private _viewerContainer: HTMLDivElement;
 
   @state() private _loadingPercent = 0;
+
+  @state() private _searchOpen = false;
+
+  @state() private _searchMatchCount = 0;
+
+  @state() private _searchCurrentMatch = 0;
+
+  @state() private _searchNotFound = false;
+
+  /** Prefills the search bar's input when it opens (e.g. from `searchQueries`). */
+  @state() private _initialSearchQuery = '';
+
+  private _searchQuery = '';
 
   @state() private _errorMessage: string;
 
@@ -127,7 +149,14 @@ export class LitPdfViewer extends LitElement {
       super.connectedCallback();
     }
 
+    // Set before the first render (rather than in `updated()`) so the bar is
+    // already open on the very first paint when `isSearchBarDisplayed` (or a
+    // non-empty `searchQueries`) is present in the initial markup.
+    this._searchOpen = this._shouldDisplaySearchBar();
+    this._searchQuery = this._initialSearchQuery = this._joinedSearchQueries();
+
     window.addEventListener('resize', this._handleWindowResise);
+    window.addEventListener('keydown', this._handleGlobalKeydown);
   }
 
   public disconnectedCallback(): void {
@@ -136,6 +165,7 @@ export class LitPdfViewer extends LitElement {
     }
 
     window.removeEventListener('resize', this._handleWindowResise);
+    window.removeEventListener('keydown', this._handleGlobalKeydown);
   }
 
   public render(): TemplateResult {
@@ -154,6 +184,22 @@ export class LitPdfViewer extends LitElement {
           @download=${this._handleDownload}
         >
           <lit-pdf-toolbar isDownloadDisabled isPrintDisabled></lit-pdf-toolbar
+        ></slot>
+
+        <slot
+          name="search"
+          @searchQuery=${this._handleSearchQuery}
+          @searchNext=${this._handleSearchNext}
+          @searchPrevious=${this._handleSearchPrevious}
+          @searchClose=${this._handleSearchClose}
+        >
+          <lit-pdf-search
+            ?open=${this._searchOpen}
+            query=${this._initialSearchQuery}
+            matchCount=${this._searchMatchCount}
+            currentMatch=${this._searchCurrentMatch}
+            ?notFound=${this._searchNotFound}
+          ></lit-pdf-search
         ></slot>
       </header>
 
@@ -197,6 +243,7 @@ export class LitPdfViewer extends LitElement {
     if (_changedProperties.has('searchQueries') && this.searchQueries?.length) {
       this._removeAccents();
       this._searchWords();
+      this._searchQuery = this._initialSearchQuery = this._joinedSearchQueries();
     }
     if (_changedProperties.has('scale') && this.scale) {
       // Wait render before refresh pdfjs scale
@@ -205,6 +252,17 @@ export class LitPdfViewer extends LitElement {
         this.scaleUpdateDelay,
       );
     }
+    if (_changedProperties.has('isSearchBarDisplayed') || _changedProperties.has('searchQueries')) {
+      this._searchOpen = this._shouldDisplaySearchBar();
+    }
+  }
+
+  private _shouldDisplaySearchBar(): boolean {
+    return this.isSearchBarDisplayed || this.searchQueries?.length > 0;
+  }
+
+  private _joinedSearchQueries(): string {
+    return this.searchQueries?.length ? this.searchQueries.join(', ') : '';
   }
 
   /**
@@ -371,6 +429,17 @@ export class LitPdfViewer extends LitElement {
       // We can use _pdfViewer now, e.g. let's change default scale.
       this._pdfViewer.currentScaleValue = this.scale;
     });
+
+    this._eventBus.on('updatefindmatchescount', ({ matchesCount }) => {
+      this._searchMatchCount = matchesCount.total;
+      this._searchCurrentMatch = matchesCount.current;
+    });
+
+    this._eventBus.on('updatefindcontrolstate', ({ state, matchesCount }) => {
+      this._searchMatchCount = matchesCount.total;
+      this._searchCurrentMatch = matchesCount.current;
+      this._searchNotFound = state === FindState.NOT_FOUND;
+    });
   }
 
   private _handleZoomIn(ticks: number): void {
@@ -456,6 +525,57 @@ export class LitPdfViewer extends LitElement {
     this._pageNumberEl = e.detail.pageNumberEl;
     this._previousPageEl = e.detail.previousPageEl;
     this._nextPageEl = e.detail.nextPageEl;
+  }
+
+  private _handleGlobalKeydown = (e: KeyboardEvent): void => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'f') {
+      e.preventDefault();
+      this._searchOpen = true;
+    }
+  };
+
+  private _handleSearchQuery(e: CustomEvent<{ query: string }>): void {
+    this._searchQuery = e.detail.query;
+    this._dispatchFind({ type: '', findPrevious: false });
+  }
+
+  private _handleSearchNext(): void {
+    this._dispatchFind({ type: 'again', findPrevious: false });
+  }
+
+  private _handleSearchPrevious(): void {
+    this._dispatchFind({ type: 'again', findPrevious: true });
+  }
+
+  private _handleSearchClose(): void {
+    this._searchOpen = false;
+    this._searchQuery = '';
+    this._searchMatchCount = 0;
+    this._searchCurrentMatch = 0;
+    this._searchNotFound = false;
+    this._eventBus.dispatch('findbarclose', { source: this });
+  }
+
+  private _dispatchFind({ type, findPrevious }: { type: string; findPrevious: boolean }): void {
+    const query = this._searchQuery
+      .split(',')
+      .map(term => removeAccents(term.trim()))
+      .filter(Boolean);
+
+    if (!query.length) {
+      return;
+    }
+
+    this._eventBus.dispatch('find', {
+      source: this,
+      type,
+      query,
+      caseSensitive: false,
+      entireWord: false,
+      findPrevious,
+      highlightAll: true,
+      matchDiacritics: false,
+    });
   }
 
   private _handleWindowResise(): void {

@@ -21,7 +21,7 @@ export class LitApp extends LitElement {
   public render(): TemplateResult {
     return html` <lit-pdf-viewer
       src="pdf-example.pdf"
-      .searchQueries=${['java*', 'loop', 'Dynamic Languages', 'native code']}
+      .searchQueries=${['java', 'loop', 'Dynamic Languages', 'native code']}
     >
     </lit-pdf-viewer>`;
   }
