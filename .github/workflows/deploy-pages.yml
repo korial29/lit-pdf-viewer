@@ -30,6 +30,13 @@ jobs:
       - name: Build library
         run: npm run build
 
+      - name: Prepare www directory
+        run: |
+          # Copy pdfjs, fonts, and style from assets (same as npm start does)
+          cp -r node_modules/pdfjs-dist www/
+          cp -r assets/fonts www/
+          cp -r assets/style www/style
+
       - name: Prepare pages content
         run: |
           mkdir -p _site
