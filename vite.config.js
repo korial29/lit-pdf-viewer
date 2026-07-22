@@ -93,6 +93,11 @@ export default defineConfig({
           dest: 'src',
           rename: { stripBase: 1 },
         },
+        {
+          src: 'www/*.pdf',
+          dest: '.',
+          rename: { stripBase: true },
+        },
       ],
     }),
   ],
