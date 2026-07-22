@@ -42,6 +42,7 @@ jobs:
           cp -r dist-demo/pdfjs-dist .
           cp -r dist-demo/src .
           cp -r dist-demo/style .
+          cp dist-demo/*.pdf .
           git add .
           git commit -m "Deploy from master: ${{ github.sha }}"
           git push -f origin gh-pages-new:gh-pages
