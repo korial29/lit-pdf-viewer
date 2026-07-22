@@ -55,22 +55,24 @@ const isBuildingDemo = process.env.BUILD_DEMO === 'true';
 
 export default defineConfig(({ command }) => ({
   base: isBuildingDemo ? '/lit-pdf-viewer/' : undefined,
-  build: isBuildingDemo ? {
-    outDir: 'dist-demo',
-    rollupOptions: {
-      input: resolve(__dirname, 'www/index.html'),
-    },
-  } : {
-    lib: {
-      entry: resolve(__dirname, 'src/index.js'),
-      formats: ['es'],
-      fileName: 'index',
-    },
-    minify: true,
-    rollupOptions: {
-      external: ['lit', /^lit\//],
-    },
-  },
+  build: isBuildingDemo
+    ? {
+        outDir: 'dist-demo',
+        rollupOptions: {
+          input: resolve(__dirname, 'www/index.html'),
+        },
+      }
+    : {
+        lib: {
+          entry: resolve(__dirname, 'src/index.js'),
+          formats: ['es'],
+          fileName: 'index',
+        },
+        minify: true,
+        rollupOptions: {
+          external: ['lit', /^lit\//],
+        },
+      },
   plugins: [
     litScssPlugin(),
     // Only relevant for `vite build`: it assembles dist/dist-demo from the
