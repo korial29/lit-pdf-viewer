@@ -47,6 +47,7 @@ function litScssPlugin() {
 const isBuildingDemo = process.env.BUILD_DEMO === 'true';
 
 export default defineConfig({
+  base: isBuildingDemo ? '/lit-pdf-viewer/' : undefined,
   build: isBuildingDemo ? {
     outDir: 'dist-demo',
     rollupOptions: {
