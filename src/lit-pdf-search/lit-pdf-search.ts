@@ -43,11 +43,23 @@ export class LitPdfSearch extends LitElement {
     this.setAttribute('role', 'search');
     this.setAttribute('aria-label', 'Recherche dans le document');
 
+    // Bound to the host (not a specific child) so Escape/Enter work no
+    // matter which control inside the bar currently has focus — a listener
+    // on `lit-input` alone would miss keydowns from the prev/next/close
+    // buttons, which are its siblings, not its descendants.
+    this.addEventListener('keydown', this._handleKeydown);
+
     // Set before the first render so the input already shows the prefilled
     // query on the very first paint, instead of a moment later.
     if (this.query) {
       this._query = this.query;
     }
+  }
+
+  public disconnectedCallback(): void {
+    super.disconnectedCallback();
+
+    this.removeEventListener('keydown', this._handleKeydown);
   }
 
   public render(): TemplateResult {
@@ -60,7 +72,6 @@ export class LitPdfSearch extends LitElement {
         .value=${this._query}
         clearable
         @input=${this._handleInput}
-        @keydown=${this._handleKeydown}
       ></lit-input>
       <span
         class="matchCount"
@@ -118,7 +129,9 @@ export class LitPdfSearch extends LitElement {
     }, QUERY_DEBOUNCE_DELAY);
   }
 
-  private _handleKeydown(e: KeyboardEvent): void {
+  // Arrow function (not a prototype method) so `this` stays bound when
+  // passed straight to `addEventListener`/`removeEventListener`.
+  private _handleKeydown = (e: KeyboardEvent): void => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (e.shiftKey) {
@@ -130,7 +143,7 @@ export class LitPdfSearch extends LitElement {
       e.preventDefault();
       this._handleClose();
     }
-  }
+  };
 
   private _handleNext(): void {
     if (!this._query) {
