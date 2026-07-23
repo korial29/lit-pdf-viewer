@@ -40,6 +40,9 @@ export class LitPdfSearch extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
 
+    this.setAttribute('role', 'search');
+    this.setAttribute('aria-label', 'Recherche dans le document');
+
     // Set before the first render so the input already shows the prefilled
     // query on the very first paint, instead of a moment later.
     if (this.query) {
@@ -59,27 +62,35 @@ export class LitPdfSearch extends LitElement {
         @input=${this._handleInput}
         @keydown=${this._handleKeydown}
       ></lit-input>
-      <span class="matchCount" role="status" aria-live="polite" ?hidden=${!hasQuery}>
+      <span
+        class="matchCount"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        ?hidden=${!hasQuery}
+      >
         ${this.notFound ? 'Aucun résultat' : `${this.currentMatch} / ${this.matchCount}`}
       </span>
       <button
         class="searchButton"
         title="Précédent"
+        aria-label="Précédent"
         ?disabled=${!hasQuery || !this.matchCount}
         @click=${this._handlePrevious}
       >
-        <lit-icon icon="chevron-up" alt="Précédent"></lit-icon>
+        <lit-icon icon="chevron-up"></lit-icon>
       </button>
       <button
         class="searchButton"
         title="Suivant"
+        aria-label="Suivant"
         ?disabled=${!hasQuery || !this.matchCount}
         @click=${this._handleNext}
       >
-        <lit-icon icon="chevron-down" alt="Suivant"></lit-icon>
+        <lit-icon icon="chevron-down"></lit-icon>
       </button>
-      <button class="searchButton" title="Fermer" @click=${this._handleClose}>
-        <lit-icon icon="cross" alt="Fermer"></lit-icon>
+      <button class="searchButton" title="Fermer" aria-label="Fermer" @click=${this._handleClose}>
+        <lit-icon icon="cross"></lit-icon>
       </button>
     `;
   }
