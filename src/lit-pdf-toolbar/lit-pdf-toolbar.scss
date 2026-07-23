@@ -6,6 +6,7 @@
   --button-radius: 4px;
   --button-color: transparent;
   --button-color-hover: #{map-get($primary-color-2, '75')};
+  --button-focus-ring: #{map-get($primary-color, 'medium')};
   --toolbar-color: #{map-get($primary-color, '25')};
   --toolbar-border: 1px solid #{map-get($primary-color-2, '50')};
   --pagecount-color: #{map-get($primary-color-2, '75')};
@@ -70,13 +71,28 @@
         color: var(--button-color-hover);
       }
     }
+
+    // Visible ring for keyboard navigation only — a mouse/touch click that
+    // lands focus here (`:focus`) stays ring-free (WCAG 2.4.11). A
+    // `box-shadow` (not `outline` + `outline-offset`) so the ring hugs the
+    // border-radius directly: the toolbar is only ~3px taller than the
+    // button, and an offset outline's extra protrusion gets sliced off by
+    // the viewer host's `overflow: hidden`.
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--button-focus-ring);
+    }
   }
 
   .pageNumber {
     outline: none;
     border: 0;
+    border-radius: var(--button-radius);
     height: 18px;
     width: 44px;
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--button-focus-ring);
+    }
   }
 
   .pageCount {

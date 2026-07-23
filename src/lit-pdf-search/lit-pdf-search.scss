@@ -3,6 +3,7 @@
 :host {
   --button-width: 26px;
   --button-height: 26px;
+  --button-focus-ring: #{map-get($primary-color, 'medium')};
 
   display: none;
   position: absolute;
@@ -56,6 +57,14 @@ lit-input {
     lit-icon {
       color: #{map-get($primary-color, 'medium')};
     }
+  }
+
+  // Visible ring for keyboard navigation only — a mouse/touch click that
+  // lands focus here (`:focus`) stays ring-free (WCAG 2.4.11). `box-shadow`
+  // rather than `outline` + `outline-offset`, consistent with `lit-input`'s
+  // `.clearButton` and safer against ancestor `overflow: hidden` clipping.
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--button-focus-ring);
   }
 }
 
