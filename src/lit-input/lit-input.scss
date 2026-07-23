@@ -68,6 +68,12 @@ input {
   }
 }
 
+// Room for the clear button (22px wide, sitting at right: 4px) so long
+// values don't render underneath it.
+.wrapper:has(.clearButton) input {
+  padding-right: 32px;
+}
+
 .clearButton {
   position: absolute;
   right: 4px;
@@ -77,6 +83,7 @@ input {
   width: 22px;
   height: 22px;
   border: 0;
+  outline: 0;
   border-radius: 50%;
   background-color: transparent;
   color: var(--input-placeholder-color);

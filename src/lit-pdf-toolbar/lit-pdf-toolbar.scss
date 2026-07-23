@@ -6,9 +6,11 @@
   --button-radius: 4px;
   --button-color: transparent;
   --button-color-hover: #{map-get($primary-color-2, '75')};
+  --button-border-hover: #{map-get($primary-color, 'medium')};
+  --button-background-hover: color-mix(in srgb, #{map-get($primary-color, 'medium')} 12%, transparent);
   --button-focus-ring: #{map-get($primary-color, 'medium')};
-  --toolbar-color: #{map-get($primary-color, '25')};
-  --toolbar-border: 1px solid #{map-get($primary-color-2, '50')};
+  --toolbar-color: #fff;
+  --toolbar-shadow: 0 1px 3px rgba(30, 16, 106, 0.15);
   --pagecount-color: #{map-get($primary-color-2, '75')};
 
   display: flex;
@@ -19,9 +21,11 @@
   // `gap` here separates the groups/separators; `.container` gap separates the
   // buttons within a group.
   gap: 16px;
-  height: 34px;
+  height: 42px;
   background-color: var(--toolbar-color);
-  border-bottom: var(--toolbar-border);
+  box-shadow: var(--toolbar-shadow);
+  position: relative;
+  z-index: 1;
   box-sizing: border-box;
 
   .container {
@@ -55,10 +59,13 @@
     justify-content: center;
     width: var(--button-width);
     height: var(--button-height);
-    border: 0;
+    // Transparent border (not `border: 0`) so the hover border doesn't shift
+    // the button's box size — only its color changes.
+    border: 1px solid transparent;
     outline: 0;
     border-radius: var(--button-radius);
     background-color: var(--button-color);
+    box-sizing: border-box;
     cursor: pointer;
 
     &:disabled {
@@ -67,6 +74,9 @@
     }
 
     &:hover {
+      border-color: var(--button-border-hover);
+      background-color: var(--button-background-hover);
+
       lit-icon {
         color: var(--button-color-hover);
       }
@@ -85,12 +95,24 @@
 
   .pageNumber {
     outline: none;
-    border: 0;
+    // Same border treatment as lit-input's `input` (border/hover/focus
+    // colors), so the page-number field reads as the same kind of control.
+    border: 1px solid #{map-get($primary-color-2, '50')};
     border-radius: var(--button-radius);
+    box-sizing: border-box;
+    padding: 0 6px;
     height: 18px;
     width: 44px;
+    transition:
+      border-color 120ms,
+      box-shadow 120ms;
+
+    &:hover:not(:disabled) {
+      border-color: #{map-get($primary-color-2, '75')};
+    }
 
     &:focus-visible {
+      border-color: var(--button-focus-ring);
       box-shadow: 0 0 0 2px var(--button-focus-ring);
     }
   }

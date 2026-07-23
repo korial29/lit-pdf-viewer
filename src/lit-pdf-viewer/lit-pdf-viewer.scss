@@ -14,7 +14,11 @@
   height: 100%;
   overflow: hidden;
 
-  * {
+  // Excludes nested custom elements (lit-pdf-toolbar, lit-pdf-search,
+  // lit-pdf-error): their own `:host` padding/margin has the same specificity
+  // as this selector, so without the exclusion this reset unpredictably wins
+  // the cascade and silently zeroes out their internal spacing.
+  *:not(lit-pdf-toolbar):not(lit-pdf-search):not(lit-pdf-error) {
     padding: 0;
     margin: 0;
   }
