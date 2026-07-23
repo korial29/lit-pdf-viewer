@@ -1,113 +1,80 @@
 import { CSSResult, html, TemplateResult, LitElement } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 
 // @ts-ignore
 import style from './lit-tooltip.scss';
 
+let nextId = 0;
+
 /**
- * A small popover shown below an anchor element.
+ * A plain-text tooltip shown below an anchor element on hover/focus.
  *
  * ```html
- * <lit-tooltip align="right">
- *   <button slot="anchor">…</button>
- *   <!-- default slot: popover content -->
- *   <button>Action</button>
+ * <lit-tooltip text="Previous Page">
+ *   <button>…</button>
  * </lit-tooltip>
  * ```
  *
- * Clicking the anchor toggles the popover; it closes on an outside click or the
- * Escape key (which also returns focus to the anchor). Call `close()` to
- * dismiss it programmatically (e.g. once an action inside it has run).
- *
- * The anchor is expected to declare its own `aria-haspopup`/`aria-label`; this
- * component keeps its `aria-expanded` in sync with `open` and treats the
- * default-slot content as a menu (`role="menu"`, with `role="menuitem"` on
- * each action) — see `lit-pdf-toolbar`'s overflow menu for a full example.
+ * Shows on `mouseenter`/`focusin` of the anchor, hides on `mouseleave`,
+ * `focusout` or Escape. The anchor gets `aria-describedby` pointing at the
+ * tooltip content so screen readers announce the text without it needing to
+ * duplicate the anchor's own `aria-label`.
  */
 @customElement('lit-tooltip')
 export class LitTooltip extends LitElement {
-  /** Horizontal edge the popover is aligned to. */
-  @property({ type: String }) public align: 'left' | 'right' = 'left';
+  /** Text shown in the tooltip. */
+  @property({ type: String }) public text = '';
 
-  /** Whether the popover is currently visible. */
-  @property({ type: Boolean, reflect: true }) public open = false;
+  @state() private _visible = false;
 
-  @query('slot[name="anchor"]') private _anchorSlot: HTMLSlotElement;
+  @query('slot') private _slot: HTMLSlotElement;
+
+  private _id = `lit-tooltip-${nextId++}`;
 
   public static get styles(): CSSResult[] {
     return [style];
   }
 
-  public connectedCallback(): void {
-    super.connectedCallback();
-    window.addEventListener('click', this._handleOutsideClick, true);
-    window.addEventListener('keydown', this._handleKeydown, true);
-  }
-
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
-    window.removeEventListener('click', this._handleOutsideClick, true);
-    window.removeEventListener('keydown', this._handleKeydown, true);
-  }
-
   public render(): TemplateResult {
     return html`
-      <div class="anchor" @click=${this._toggle}>
-        <slot name="anchor"></slot>
-      </div>
-      <div class="content" role="menu" data-align=${this.align} ?data-open=${this.open}>
+      <div
+        class="anchor"
+        @mouseenter=${this._show}
+        @mouseleave=${this._hide}
+        @focusin=${this._show}
+        @focusout=${this._hide}
+        @keydown=${this._handleKeydown}
+      >
         <slot></slot>
+      </div>
+      <div
+        class="content"
+        role="tooltip"
+        id=${this._id}
+        aria-label=${this.text}
+        ?data-visible=${this._visible}
+      >
+        ${this.text}
       </div>
     `;
   }
 
-  /** Hide the popover. */
-  public close(): void {
-    this.open = false;
-    this._syncAnchorExpanded();
-  }
-
   protected firstUpdated(): void {
-    this._syncAnchorExpanded();
+    const anchor = this._slot?.assignedElements()[0];
+    anchor?.setAttribute('aria-describedby', this._id);
   }
 
-  private _toggle(): void {
-    this.open = !this.open;
-    this._syncAnchorExpanded();
+  private _show = (): void => {
+    this._visible = true;
+  };
 
-    if (this.open) {
-      this.updateComplete.then(() => this._focusFirstItem());
-    }
-  }
-
-  private _syncAnchorExpanded(): void {
-    const anchor = this._anchorSlot?.assignedElements()[0];
-    anchor?.setAttribute('aria-expanded', String(this.open));
-  }
-
-  private _focusFirstItem(): void {
-    const [firstItem] = this.querySelectorAll<HTMLElement>(':scope > :not([slot])');
-    firstItem?.focus();
-  }
-
-  private _focusAnchor(): void {
-    const anchor = <HTMLElement>this._anchorSlot?.assignedElements()[0];
-    anchor?.focus();
-  }
-
-  // Arrow functions so `this` stays bound when used as window listeners.
-  private _handleOutsideClick = (event: MouseEvent): void => {
-    if (this.open && !event.composedPath().includes(this)) {
-      this.open = false;
-      this._syncAnchorExpanded();
-    }
+  private _hide = (): void => {
+    this._visible = false;
   };
 
   private _handleKeydown = (event: KeyboardEvent): void => {
-    if (this.open && event.key === 'Escape') {
-      this.open = false;
-      this._syncAnchorExpanded();
-      this._focusAnchor();
+    if (event.key === 'Escape') {
+      this._visible = false;
     }
   };
 }

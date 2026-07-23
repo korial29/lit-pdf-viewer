@@ -37,7 +37,7 @@
 
   // The "..." overflow menu is only shown on small screens (see media query);
   // on wide screens the rotation buttons sit inline in the toolbar instead.
-  .moreTooltip {
+  .moreWrapper {
     display: none;
   }
 
@@ -137,11 +137,11 @@
     }
 
     // Hide the inline secondary buttons; they live in the "..." menu instead.
-    .toolbarButton.inlineOnly {
+    .inlineOnly {
       display: none;
     }
 
-    .moreTooltip {
+    .moreWrapper {
       display: inline-flex;
     }
 

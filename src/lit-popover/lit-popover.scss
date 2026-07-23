@@ -1,0 +1,32 @@
+:host {
+  position: relative;
+  display: inline-flex;
+}
+
+.anchor {
+  display: inline-flex;
+}
+
+.content {
+  position: absolute;
+  top: calc(100% + 4px);
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  padding: 4px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+}
+
+.content[data-align='left'] {
+  left: 0;
+}
+
+.content[data-align='right'] {
+  right: 0;
+}
+
+.content[data-open] {
+  display: flex;
+}
