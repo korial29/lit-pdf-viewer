@@ -1,5 +1,6 @@
 {
   "name": "lit-pdf-viewer",
+  "description": "A PDF viewer web component built with Lit and PDF.js, with page navigation, zoom, and find-in-page search.",
   "license": "Apache-2.0",
   "version": "1.1.0",
   "files": [
@@ -9,8 +10,19 @@
     "type": "git",
     "url": "https://github.com/korial29/lit-pdf-viewer.git"
   },
+  "homepage": "https://korial29.github.io/lit-pdf-viewer/",
   "keywords": [
-    "lit-pdf-viewer"
+    "lit-pdf-viewer",
+    "pdf",
+    "pdf-viewer",
+    "pdfjs",
+    "pdf.js",
+    "lit",
+    "lit-element",
+    "web-component",
+    "web-components",
+    "custom-element",
+    "custom-elements"
   ],
   "author": "Ludovic Dupont <ludovic.dupont29@gmail.com>",
   "dependencies": {

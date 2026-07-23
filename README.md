@@ -1,5 +1,10 @@
 # lit-pdf-viewer
 
+[![npm version](https://img.shields.io/npm/v/lit-pdf-viewer.svg)](https://www.npmjs.com/package/lit-pdf-viewer)
+[![npm downloads](https://img.shields.io/npm/dm/lit-pdf-viewer.svg)](https://www.npmjs.com/package/lit-pdf-viewer)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/lit-pdf-viewer)](https://bundlephobia.com/package/lit-pdf-viewer)
+[![license](https://img.shields.io/npm/l/lit-pdf-viewer.svg)](LICENSE)
+
 A [Lit](https://lit.dev) web component for displaying PDFs, built on top of Mozilla's [PDF.js](https://mozilla.github.io/pdf.js/).
 
 ## Live demo
