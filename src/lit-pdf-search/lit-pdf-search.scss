@@ -3,6 +3,8 @@
 :host {
   --button-width: 26px;
   --button-height: 26px;
+  --button-border-hover: #{map-get($primary-color, 'medium')};
+  --button-background-hover: color-mix(in srgb, #{map-get($primary-color, 'medium')} 12%, transparent);
   --button-focus-ring: #{map-get($primary-color, 'medium')};
 
   display: none;
@@ -11,7 +13,7 @@
   right: 12px;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   margin-top: 6px;
   background-color: #fff;
   border-radius: 6px;
@@ -27,7 +29,6 @@
 lit-input {
   --input-height: 30px;
   width: 170px;
-  margin: 16px;
 }
 
 .matchCount {
@@ -42,10 +43,13 @@ lit-input {
   justify-content: center;
   width: var(--button-width);
   height: var(--button-height);
-  border: 0;
+  // Transparent border (not `border: 0`) so the hover border doesn't shift
+  // the button's box size — only its color changes.
+  border: 1px solid transparent;
   outline: 0;
   border-radius: 4px;
   background-color: transparent;
+  box-sizing: border-box;
   cursor: pointer;
 
   &:disabled {
@@ -54,6 +58,9 @@ lit-input {
   }
 
   &:hover {
+    border-color: var(--button-border-hover);
+    background-color: var(--button-background-hover);
+
     lit-icon {
       color: #{map-get($primary-color, 'medium')};
     }
