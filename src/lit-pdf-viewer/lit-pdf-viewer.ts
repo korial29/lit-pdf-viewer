@@ -302,7 +302,6 @@ export class LitPdfViewer extends LitElement {
   }
 
   protected firstUpdated(): void {
-    this._viewerReadyPromise = this.initViewer();
     this._viewerContainer.addEventListener('scroll', this._handleViewerScroll);
   }
 
@@ -318,11 +317,17 @@ export class LitPdfViewer extends LitElement {
       this._searchQuery = this._initialSearchQuery = this._joinedSearchQueries();
     }
     if (_changedProperties.has('scale') && this.scale) {
-      // Wait render before refresh pdfjs scale
-      setTimeout(async () => {
-        await this._viewerReadyPromise;
-        this._eventBus.dispatch('scalechanged', { value: this.scale });
-      }, this.scaleUpdateDelay);
+      // Only meaningful once a document has actually started loading (which
+      // is what initializes the viewer in the first place) — skip it
+      // otherwise instead of forcing pdfjs-dist's lazy chunk to load just
+      // because `scale` was set.
+      if (this._viewerReadyPromise) {
+        // Wait render before refresh pdfjs scale
+        setTimeout(async () => {
+          await this._viewerReadyPromise;
+          this._eventBus.dispatch('scalechanged', { value: this.scale });
+        }, this.scaleUpdateDelay);
+      }
     }
     if (_changedProperties.has('isSearchBarDisplayed') || _changedProperties.has('searchQueries')) {
       this._searchOpen = this._shouldDisplaySearchBar();
@@ -343,7 +348,7 @@ export class LitPdfViewer extends LitElement {
    *                      is opened.
    */
   private async _open(params: { url: string }): Promise<PDFDocumentProxy | void> {
-    await this._viewerReadyPromise;
+    await this._ensureViewerReady();
 
     if (this._pdfLoadingTask) {
       // We need to destroy already opened document
@@ -466,6 +471,17 @@ export class LitPdfViewer extends LitElement {
     if (percent > this._loadingPercent || Number.isNaN(percent)) {
       this._loadingPercent = percent;
     }
+  }
+
+  // Lazily kicks off `initViewer()` (and with it, pdfjs-dist's dynamically
+  // imported chunk) on first actual need — i.e. once a document is being
+  // opened — rather than unconditionally on connect, so mounting
+  // `<lit-pdf-viewer>` without a `src` yet never pays for pdfjs-dist.
+  private _ensureViewerReady(): Promise<void> {
+    if (!this._viewerReadyPromise) {
+      this._viewerReadyPromise = this.initViewer();
+    }
+    return this._viewerReadyPromise;
   }
 
   private async initViewer(): Promise<void> {
