@@ -1,0 +1,110 @@
+@import '../../assets/style/colors.scss';
+
+:host {
+  --thumbnail-border-radius: 4px;
+  --sidebar-width: 160px;
+  --sidebar-transition-duration: 240ms;
+  --sidebar-transition-easing: cubic-bezier(0.65, 0, 0.35, 1);
+
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 12px 0;
+  background-color: var(--litpdf-surface-background, #fff);
+  border-right: 1px solid transparent;
+  opacity: 0;
+  transform: translateX(-12px);
+  pointer-events: none;
+  transition:
+    width var(--sidebar-transition-duration) var(--sidebar-transition-easing),
+    padding var(--sidebar-transition-duration) var(--sidebar-transition-easing),
+    opacity var(--sidebar-transition-duration) var(--sidebar-transition-easing),
+    transform var(--sidebar-transition-duration) var(--sidebar-transition-easing);
+}
+
+:host([open]) {
+  width: var(--sidebar-width);
+  padding: 12px 8px;
+  overflow-y: auto;
+  border-right-color: var(--litpdf-border-color, #{map-get($primary-color-2, '50')});
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.thumbnail {
+  display: flex;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: var(--thumbnail-border-radius);
+  background: transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  outline: 0;
+
+  &:hover {
+    border-color: var(--litpdf-button-border-hover, #{map-get($primary-color, 'medium')});
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--litpdf-focus-ring-color, #{map-get($primary-color, 'medium')});
+  }
+
+  &[data-current] {
+    border-color: var(--litpdf-accent-color, #{map-get($primary-color, 'medium')});
+  }
+}
+
+.canvas {
+  display: block;
+  background-color: #fff;
+  box-shadow: var(--litpdf-surface-shadow, #{$shadow});
+}
+
+.pageNumber {
+  font-size: 0.7rem;
+  color: var(--litpdf-text-color-muted, #{map-get($primary-color-2, '75')});
+}
+
+// On small screens a fixed-width sidebar would leave no room for the
+// document itself, so it overlays the viewer as a drawer instead of sharing
+// the row with it. Fixed width regardless of open state (unlike the desktop
+// push layout, which collapses to 0) — only opacity/transform (inherited
+// from the base :host/:host([open]) rules above) show or hide it.
+@media (max-width: 600px) {
+  :host {
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 600;
+    width: 75vw;
+    max-width: 260px;
+    padding: 12px 8px;
+    overflow-y: auto;
+    box-shadow: var(--litpdf-surface-shadow, #{$shadow});
+  }
+
+  :host([open]) {
+    width: 75vw;
+    max-width: 260px;
+  }
+}

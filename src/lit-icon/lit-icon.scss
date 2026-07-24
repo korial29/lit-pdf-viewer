@@ -1,0 +1,24 @@
+@import '../../assets/style/colors.scss';
+
+:host {
+  --icon-size: 16px;
+  --icon-display: block;
+  --icon-weight: normal;
+
+  height: var(--icon-size);
+  display: var(--icon-display);
+  font-family: 'lit-icon';
+  font-variant-ligatures: discretionary-ligatures;
+  font-feature-settings: 'dlig';
+  white-space: nowrap;
+  font-size: var(--icon-size);
+  font-weight: var(--icon-weight);
+
+  .icon {
+    color: inherit;
+  }
+}
+
+:host(.small) {
+  --icon-size: 14px;
+}

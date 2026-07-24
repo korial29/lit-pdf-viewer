@@ -1,0 +1,10 @@
+@font-face {
+  font-family: 'lit-icon';
+  src:
+    url('../fonts/lit-icon.ttf?pjjjyk') format('truetype'),
+    url('../fonts/lit-icon.woff?pjjjyk') format('woff'),
+    url('../fonts/lit-icon.svg?pjjjyk#lit-icon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}

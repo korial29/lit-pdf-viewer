@@ -1,0 +1,231 @@
+@import '../../assets/style/colors.scss';
+
+:host {
+  --button-width: 28px;
+  --button-height: 28px;
+  --button-radius: var(--litpdf-button-radius, 4px);
+  --button-color: var(--litpdf-button-background, transparent);
+  --button-color-hover: var(--litpdf-icon-color-hover, #{map-get($primary-color-2, '75')});
+  --button-border-hover: var(--litpdf-button-border-hover, #{map-get($primary-color, 'medium')});
+  --button-background-hover: var(
+    --litpdf-button-background-hover,
+    color-mix(in srgb, #{map-get($primary-color, 'medium')} 12%, transparent)
+  );
+  --button-focus-ring: var(--litpdf-focus-ring-color, #{map-get($primary-color, 'medium')});
+  --input-border: var(--litpdf-border-color, #{map-get($primary-color-2, '50')});
+  --input-border-hover: var(--litpdf-border-color-hover, #{map-get($primary-color-2, '75')});
+  // Fixed px (not a `%` height) so every separator — whether it's a direct
+  // child of `:host` or nested inside a heightless `.container` — ends up
+  // the same visual height. Kept at half the toolbar's own height, updated
+  // alongside it in each breakpoint below.
+  --separator-height: 21px;
+  --toolbar-color: var(--litpdf-toolbar-background, #fff);
+  --toolbar-shadow: var(--litpdf-toolbar-shadow, 0 1px 3px rgba(30, 16, 106, 0.15));
+  color: var(--litpdf-icon-color, #{map-get($primary-color-2, 'normal')});
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // Spacing is driven entirely by `gap` (never per-element margins) so every
+  // slot — button, field, separator or the "..." menu — is evenly spaced.
+  // `gap` here separates the groups/separators; `.container` gap separates the
+  // buttons within a group.
+  gap: 16px;
+  height: 42px;
+  background-color: var(--toolbar-color);
+  box-shadow: var(--toolbar-shadow);
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  // The "..." overflow menu is only shown on small screens (see media query);
+  // on wide screens the rotation buttons sit inline in the toolbar instead.
+  .moreWrapper {
+    display: none;
+  }
+
+  .moreIcon {
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+
+  .sidebarIcon,
+  .searchIcon,
+  .fullscreenIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .zoomPercent {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    color: inherit;
+  }
+
+  .zoomPercentInput {
+    width: 36px;
+    padding: 2px 4px;
+    // Same 1px bordered look as `lit-input` (not the borderless
+    // transparent/hover-fill treatment the icon buttons use), so it reads as
+    // a text field rather than another toolbar button.
+    border: 1px solid var(--input-border);
+    border-radius: var(--button-radius);
+    background-color: var(--litpdf-surface-background, #fff);
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+    text-align: right;
+    box-sizing: border-box;
+    transition:
+      border-color 120ms,
+      box-shadow 120ms;
+
+    // Hide the native up/down spinners so the field reads as a plain
+    // percentage display that happens to be editable.
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &:hover {
+      border-color: var(--input-border-hover);
+    }
+
+    &:focus-visible {
+      outline: 0;
+      border-color: var(--button-focus-ring);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--button-focus-ring) 30%, transparent);
+    }
+  }
+
+  .separator {
+    align-self: center;
+    height: var(--separator-height);
+    width: 1px;
+    background-color: var(--litpdf-border-color, #{map-get($primary-color-2, '50')});
+  }
+
+  .toolbarButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--button-width);
+    height: var(--button-height);
+    // Transparent border (not `border: 0`) so the hover border doesn't shift
+    // the button's box size — only its color changes.
+    border: 1px solid transparent;
+    outline: 0;
+    border-radius: var(--button-radius);
+    background-color: var(--button-color);
+    // `<button>` doesn't inherit `color` from an ancestor like normal elements
+    // do (it uses the UA's `buttontext` by default), so `--litpdf-icon-color`
+    // set on `:host` would otherwise never reach the icon.
+    color: inherit;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    &:hover {
+      border-color: var(--button-border-hover);
+      background-color: var(--button-background-hover);
+
+      lit-icon,
+      .sidebarIcon {
+        color: var(--button-color-hover);
+      }
+    }
+
+    // Visible ring for keyboard navigation only — a mouse/touch click that
+    // lands focus here (`:focus`) stays ring-free (WCAG 2.4.11). A
+    // `box-shadow` (not `outline` + `outline-offset`) so the ring hugs the
+    // border-radius directly: the toolbar is only ~3px taller than the
+    // button, and an offset outline's extra protrusion gets sliced off by
+    // the viewer host's `overflow: hidden`.
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--button-focus-ring);
+    }
+
+    // Toggle buttons (e.g. the sidebar toggle) reuse the hover treatment to
+    // show they're "pressed" while their panel is open.
+    &[aria-expanded='true'],
+    &[aria-pressed='true'] {
+      border-color: var(--button-border-hover);
+      background-color: var(--button-background-hover);
+    }
+  }
+
+  // On small screens the row can't hold every button, so we move the rotate
+  // and fullscreen actions into the "..." overflow menu (print/download/
+  // search stay inline — we have the room now that page navigation lives in
+  // its own floating pagination pill) and enlarge the remaining controls to
+  // comfortable ~44px touch targets (Apple HIG minimum).
+  @media (max-width: 600px) {
+    --button-width: 44px;
+    --button-height: 44px;
+
+    // Tighter than the desktop 16px/8px gaps — the search button (always
+    // inline, unlike rotate/fullscreen) adds width back that the overflow
+    // menu doesn't reclaim, so the row needs to run leaner to still fit on
+    // mainstream phone widths (~375px+) without horizontal scrolling.
+    gap: 4px;
+    height: 48px;
+    --separator-height: 24px;
+
+    .container {
+      gap: 4px;
+    }
+
+    // Hide the inline rotate/fullscreen buttons and their separator; they
+    // live in the "..." menu instead.
+    .inlineOnly {
+      display: none;
+    }
+
+    .moreWrapper {
+      display: inline-flex;
+    }
+
+    .zoomPercentInput {
+      width: 32px;
+      font-size: 14px;
+    }
+
+    // Drop the "%" suffix — the field is already labelled for screen
+    // readers via aria-label, and every pixel counts on phone widths.
+    .zoomPercent span {
+      display: none;
+    }
+  }
+
+  // Very narrow phones (≈320px) can't fit the whole row of 44px targets; shrink
+  // them a little so the bar still fits rather than bringing back a horizontal
+  // scrollbar. Mainstream widths (360px+) keep the full 44px targets above.
+  @media (max-width: 359px) {
+    --button-width: 40px;
+    --button-height: 40px;
+
+    height: 44px;
+    --separator-height: 22px;
+
+    .zoomPercentInput {
+      width: 30px;
+    }
+  }
+}

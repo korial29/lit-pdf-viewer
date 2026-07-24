@@ -1,0 +1,30 @@
+@import '../../assets/style/colors.scss';
+
+:host {
+  position: relative;
+  display: inline-flex;
+}
+
+.anchor {
+  display: inline-flex;
+}
+
+.content {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: none;
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: var(--litpdf-tooltip-color, #fff);
+  background-color: var(--litpdf-tooltip-background, #{map-get($primary-color-2, 'normal')});
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.content[data-visible] {
+  display: block;
+}

@@ -1,0 +1,55 @@
+{
+  "toolbar": {
+    "toolbarLabel": "Barre d'outils PDF",
+    "sidebarControls": "Contrôles du panneau latéral",
+    "toggleSidebar": "Afficher/masquer les miniatures des pages",
+    "zoomControls": "Contrôles de zoom",
+    "zoomOut": "Zoom arrière",
+    "zoomIn": "Zoom avant",
+    "documentActions": "Actions du document",
+    "rotateCounterClockwise": "Rotation antihoraire",
+    "rotateClockwise": "Rotation horaire",
+    "print": "Imprimer",
+    "download": "Télécharger",
+    "search": "Rechercher dans le document",
+    "fullscreen": "Passer en plein écran",
+    "exitFullscreen": "Quitter le plein écran",
+    "zoomPercent": "Pourcentage de zoom",
+    "more": "Plus"
+  },
+  "pagination": {
+    "paginationLabel": "Navigation des pages",
+    "previousPage": "Page précédente",
+    "nextPage": "Page suivante",
+    "pageNumber": "Numéro de page"
+  },
+  "thumbnails": {
+    "thumbnailsLabel": "Miniatures des pages",
+    "pageLabel": "Page {number}"
+  },
+  "search": {
+    "searchLabel": "Recherche dans le document",
+    "inputLabel": "Rechercher dans le document",
+    "placeholder": "Rechercher...",
+    "noResults": "Aucun résultat",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "close": "Fermer"
+  },
+  "error": {
+    "moreInfo": "plus d'informations",
+    "lessInfo": "moins d'informations",
+    "closeError": "fermer l'erreur",
+    "invalidPdf": "Fichier PDF invalide ou corrompu.",
+    "missingPdf": "Fichier PDF manquant.",
+    "unexpectedResponse": "Réponse du serveur inattendue.",
+    "genericError": "Une erreur est survenue lors du chargement du PDF.",
+    "messageLabel": "Message",
+    "stackLabel": "Pile",
+    "fileLabel": "Fichier",
+    "lineLabel": "Ligne"
+  },
+  "viewer": {
+    "loading": "Chargement : {percent}%"
+  }
+}

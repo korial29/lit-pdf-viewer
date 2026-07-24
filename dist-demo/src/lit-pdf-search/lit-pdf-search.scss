@@ -1,0 +1,96 @@
+@import '../../assets/style/colors.scss';
+
+:host {
+  --button-width: 26px;
+  --button-height: 26px;
+  --button-border-hover: var(--litpdf-button-border-hover, #{map-get($primary-color, 'medium')});
+  --button-background-hover: var(
+    --litpdf-button-background-hover,
+    color-mix(in srgb, #{map-get($primary-color, 'medium')} 12%, transparent)
+  );
+  --button-focus-ring: var(--litpdf-focus-ring-color, #{map-get($primary-color, 'medium')});
+
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 12px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  margin-top: 6px;
+  background-color: var(--litpdf-surface-background, #fff);
+  border-radius: 6px;
+  box-shadow: var(--litpdf-surface-shadow, #{$shadow});
+  z-index: 500;
+  box-sizing: border-box;
+  color: var(--litpdf-icon-color, #{map-get($primary-color-2, 'normal')});
+}
+
+:host([open]) {
+  display: flex;
+}
+
+lit-input {
+  --input-height: 30px;
+  width: 170px;
+}
+
+.matchCount {
+  font-size: 0.75rem;
+  color: var(--litpdf-text-color-muted, #{map-get($primary-color-2, '75')});
+  white-space: nowrap;
+}
+
+.searchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-width);
+  height: var(--button-height);
+  // Transparent border (not `border: 0`) so the hover border doesn't shift
+  // the button's box size — only its color changes.
+  border: 1px solid transparent;
+  outline: 0;
+  border-radius: 4px;
+  background-color: transparent;
+  // `<button>` doesn't inherit `color` from an ancestor like normal elements
+  // do (it uses the UA's `buttontext` by default), so `--litpdf-icon-color`
+  // set on `:host` would otherwise never reach the icon.
+  color: inherit;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &:hover {
+    border-color: var(--button-border-hover);
+    background-color: var(--button-background-hover);
+
+    lit-icon {
+      color: var(--litpdf-icon-color-hover, #{map-get($primary-color, 'medium')});
+    }
+  }
+
+  // Visible ring for keyboard navigation only — a mouse/touch click that
+  // lands focus here (`:focus`) stays ring-free (WCAG 2.4.11). `box-shadow`
+  // rather than `outline` + `outline-offset`, consistent with `lit-input`'s
+  // `.clearButton` and safer against ancestor `overflow: hidden` clipping.
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--button-focus-ring);
+  }
+}
+
+@media (max-width: 600px) {
+  :host {
+    right: 6px;
+    left: 6px;
+  }
+
+  lit-input {
+    width: auto;
+    flex: 1 1 auto;
+  }
+}

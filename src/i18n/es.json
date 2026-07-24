@@ -1,0 +1,55 @@
+{
+  "toolbar": {
+    "toolbarLabel": "Barra de herramientas PDF",
+    "sidebarControls": "Controles del panel lateral",
+    "toggleSidebar": "Mostrar/ocultar miniaturas de páginas",
+    "zoomControls": "Controles de zoom",
+    "zoomOut": "Alejar",
+    "zoomIn": "Acercar",
+    "documentActions": "Acciones del documento",
+    "rotateCounterClockwise": "Girar en sentido antihorario",
+    "rotateClockwise": "Girar en sentido horario",
+    "print": "Imprimir",
+    "download": "Descargar",
+    "search": "Buscar en el documento",
+    "fullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
+    "zoomPercent": "Porcentaje de zoom",
+    "more": "Más"
+  },
+  "pagination": {
+    "paginationLabel": "Navegación de páginas",
+    "previousPage": "Página anterior",
+    "nextPage": "Página siguiente",
+    "pageNumber": "Número de página"
+  },
+  "thumbnails": {
+    "thumbnailsLabel": "Miniaturas de páginas",
+    "pageLabel": "Página {number}"
+  },
+  "search": {
+    "searchLabel": "Buscar en el documento",
+    "inputLabel": "Buscar en el documento",
+    "placeholder": "Buscar...",
+    "noResults": "Sin resultados",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "close": "Cerrar"
+  },
+  "error": {
+    "moreInfo": "más información",
+    "lessInfo": "menos información",
+    "closeError": "cerrar error",
+    "invalidPdf": "Archivo PDF inválido o dañado.",
+    "missingPdf": "Archivo PDF no encontrado.",
+    "unexpectedResponse": "Respuesta inesperada del servidor.",
+    "genericError": "Se produjo un error al cargar el PDF.",
+    "messageLabel": "Mensaje",
+    "stackLabel": "Pila",
+    "fileLabel": "Archivo",
+    "lineLabel": "Línea"
+  },
+  "viewer": {
+    "loading": "Cargando: {percent}%"
+  }
+}
