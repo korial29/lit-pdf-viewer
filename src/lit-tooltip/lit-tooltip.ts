@@ -16,9 +16,9 @@ let nextId = 0;
  * ```
  *
  * Shows on `mouseenter`/`focusin` of the anchor, hides on `mouseleave`,
- * `focusout` or Escape. The anchor gets `aria-describedby` pointing at the
- * tooltip content so screen readers announce the text without it needing to
- * duplicate the anchor's own `aria-label`.
+ * `focusout`, click or Escape. The anchor gets `aria-describedby` pointing at
+ * the tooltip content so screen readers announce the text without it needing
+ * to duplicate the anchor's own `aria-label`.
  */
 @customElement('lit-tooltip')
 export class LitTooltip extends LitElement {
@@ -43,6 +43,7 @@ export class LitTooltip extends LitElement {
         @mouseleave=${this._hide}
         @focusin=${this._show}
         @focusout=${this._hide}
+        @click=${this._hide}
         @keydown=${this._handleKeydown}
       >
         <slot></slot>

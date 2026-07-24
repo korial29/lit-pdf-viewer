@@ -1,5 +1,5 @@
 import { CSSResult, html, TemplateResult, LitElement } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import '../lit-icon/lit-icon';
 import '../lit-tooltip/lit-tooltip';
 import '../lit-popover/lit-popover';
@@ -10,23 +10,17 @@ import style from './lit-pdf-toolbar.scss';
 
 @customElement('lit-pdf-toolbar')
 export class LitPdfToolbar extends LitElement {
-  @property({ type: Number }) public pageCount: number;
-
   @property({ type: Boolean }) public isPrintDisabled: boolean;
 
   @property({ type: Boolean }) public isDownloadDisabled: boolean;
+
+  @property({ type: Boolean }) public isSidebarOpen: boolean;
 
   /** Locale to translate the toolbar into (defaults to the browser's language). */
   @property({ type: String }) public locale: string;
 
   /** Overrides for individual translation strings. */
   @property({ type: Object }) public translations: Partial<ToolbarTranslations> = {};
-
-  @query('#previous') private _previousPageEl: HTMLButtonElement;
-
-  @query('#next') private _nextPageEl: HTMLButtonElement;
-
-  @query('#pageNumber') private _pageNumberEl: HTMLButtonElement;
 
   public static get styles(): CSSResult[] {
     return [style];
@@ -47,41 +41,29 @@ export class LitPdfToolbar extends LitElement {
     const t = this._t;
 
     return html`
-      <section class="container" role="group" aria-label=${t.pageNavigation}>
-        <lit-tooltip text=${t.previousPage}>
+      <section class="container" role="group" aria-label=${t.sidebarControls}>
+        <lit-tooltip text=${t.toggleSidebar}>
           <button
-            class="toolbarButton pageUp"
-            aria-label=${t.previousPage}
-            id="previous"
-            disabled
-            @click=${this._handlePrevious}
+            class="toolbarButton sidebarToggle"
+            aria-label=${t.toggleSidebar}
+            aria-expanded=${this.isSidebarOpen ? 'true' : 'false'}
+            @click=${this._handleToggleSidebar}
           >
-            <lit-icon icon="arrow-up"></lit-icon>
+            <svg
+              class="sidebarIcon"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+              <path d="M9 3v18"></path>
+            </svg>
           </button>
         </lit-tooltip>
-        <lit-tooltip text=${t.nextPage}>
-          <button
-            class="toolbarButton pageDown"
-            aria-label=${t.nextPage}
-            id="next"
-            @click=${this._handleNext}
-          >
-            <lit-icon icon="arrow-down"></lit-icon>
-          </button>
-        </lit-tooltip>
-
-        <input
-          type="number"
-          id="pageNumber"
-          class="toolbarField pageNumber"
-          value="1"
-          size="4"
-          min="1"
-          aria-label=${t.pageNumber}
-          aria-describedby="pageCount"
-          @change=${this._handlePageChange}
-        />
-        <span class="pageCount" id="pageCount"> / ${this.pageCount}</span>
       </section>
 
       <span class="separator" role="separator" aria-orientation="vertical"></span>
@@ -132,7 +114,7 @@ export class LitPdfToolbar extends LitElement {
             <lit-icon icon="rotate-cw"></lit-icon>
           </button>
         </lit-tooltip>
-        <lit-tooltip class="inlineOnly" text=${t.print}>
+        <lit-tooltip text=${t.print}>
           <button
             class="toolbarButton print"
             aria-label=${t.print}
@@ -143,7 +125,7 @@ export class LitPdfToolbar extends LitElement {
           </button>
         </lit-tooltip>
 
-        <lit-tooltip class="inlineOnly" text=${t.download}>
+        <lit-tooltip text=${t.download}>
           <button
             class="toolbarButton download"
             aria-label=${t.download}
@@ -154,7 +136,7 @@ export class LitPdfToolbar extends LitElement {
           </button>
         </lit-tooltip>
 
-        <!-- On small screens the secondary actions collapse into this "..."
+        <!-- On small screens the rotate buttons collapse into this "..."
              overflow menu, pinned to the far right. It is hidden on desktop. -->
         <lit-tooltip class="moreWrapper" text=${t.more}>
           <lit-popover class="morePopover" align="right">
@@ -185,26 +167,6 @@ export class LitPdfToolbar extends LitElement {
             >
               <lit-icon icon="rotate-cw"></lit-icon>
             </button>
-            <button
-              class="toolbarButton print"
-              title=${t.print}
-              aria-label=${t.print}
-              role="menuitem"
-              @click=${!this.isPrintDisabled && this._handlePrint}
-              ?disabled=${this.isPrintDisabled}
-            >
-              <lit-icon icon="print"></lit-icon>
-            </button>
-            <button
-              class="toolbarButton download"
-              title=${t.download}
-              aria-label=${t.download}
-              role="menuitem"
-              @click=${!this.isDownloadDisabled && this._handleDownload}
-              ?disabled=${this.isDownloadDisabled}
-            >
-              <lit-icon icon="download"></lit-icon>
-            </button>
           </lit-popover>
         </lit-tooltip>
       </section>
@@ -218,16 +180,11 @@ export class LitPdfToolbar extends LitElement {
   }
 
   protected firstUpdated(): void {
-    this.dispatchEvent(
-      new CustomEvent('toolbarConnected', {
-        bubbles: true,
-        detail: {
-          previousPageEl: this._previousPageEl,
-          nextPageEl: this._nextPageEl,
-          pageNumberEl: this._pageNumberEl,
-        },
-      }),
-    );
+    this.dispatchEvent(new CustomEvent('toolbarConnected', { bubbles: true }));
+  }
+
+  private _handleToggleSidebar(): void {
+    this.dispatchEvent(new CustomEvent('toggleSidebar', { bubbles: true }));
   }
 
   private _handleZoomIn(): void {
@@ -236,18 +193,6 @@ export class LitPdfToolbar extends LitElement {
 
   private _handleZoomOut(): void {
     this.dispatchEvent(new CustomEvent('zoomOut', { bubbles: true }));
-  }
-
-  private _handlePrevious(): void {
-    this.dispatchEvent(new CustomEvent('previousPage', { bubbles: true }));
-  }
-
-  private _handleNext(): void {
-    this.dispatchEvent(new CustomEvent('nextPage', { bubbles: true }));
-  }
-
-  private _handlePageChange(): void {
-    this.dispatchEvent(new CustomEvent('pageChange', { bubbles: true }));
   }
 
   private _handleRotateCw(): void {

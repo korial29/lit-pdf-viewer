@@ -14,11 +14,14 @@
   height: 100%;
   overflow: hidden;
 
-  // Excludes nested custom elements (lit-pdf-toolbar, lit-pdf-search,
-  // lit-pdf-error): their own `:host` padding/margin has the same specificity
-  // as this selector, so without the exclusion this reset unpredictably wins
-  // the cascade and silently zeroes out their internal spacing.
-  *:not(lit-pdf-toolbar):not(lit-pdf-search):not(lit-pdf-error) {
+  // Excludes nested custom elements (lit-pdf-toolbar, lit-pdf-pagination,
+  // lit-pdf-thumbnails, lit-pdf-search, lit-pdf-error): their own `:host`
+  // padding/margin has the same specificity as this selector, so without the
+  // exclusion this reset unpredictably wins the cascade and silently zeroes
+  // out their internal spacing.
+  *:not(lit-pdf-toolbar):not(lit-pdf-pagination):not(lit-pdf-thumbnails):not(lit-pdf-search):not(
+      lit-pdf-error
+    ) {
     padding: 0;
     margin: 0;
   }
@@ -38,15 +41,22 @@
     font-size: 2rem;
   }
 
-  // The wrapper grows to fill the space between the toolbar and the bottom of
-  // the host. Allow it to shrink below its content (min-height: 0) so it — and
-  // only it — scrolls, instead of overflowing the host and creating a second
-  // scrollbar.
-  .viewerWrapper {
+  // Lays the thumbnails sidebar and the viewer side by side, filling the
+  // space between the toolbar and the bottom of the host. Allow it to shrink
+  // below its content (min-height: 0) so its children — not this row — end up
+  // scrolling.
+  .contentWrapper {
     position: relative;
+    display: flex;
     flex: 1 1 auto;
     min-height: 0;
     width: 100%;
+  }
+
+  .viewerWrapper {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   // pdf.js requires its scroll container to be absolutely positioned; here it

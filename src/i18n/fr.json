@@ -1,10 +1,8 @@
 {
   "toolbar": {
     "toolbarLabel": "Barre d'outils PDF",
-    "pageNavigation": "Navigation des pages",
-    "previousPage": "Page précédente",
-    "nextPage": "Page suivante",
-    "pageNumber": "Numéro de page",
+    "sidebarControls": "Contrôles du panneau latéral",
+    "toggleSidebar": "Afficher/masquer les miniatures des pages",
     "zoomControls": "Contrôles de zoom",
     "zoomOut": "Zoom arrière",
     "zoomIn": "Zoom avant",
@@ -14,6 +12,16 @@
     "print": "Imprimer",
     "download": "Télécharger",
     "more": "Plus"
+  },
+  "pagination": {
+    "paginationLabel": "Navigation des pages",
+    "previousPage": "Page précédente",
+    "nextPage": "Page suivante",
+    "pageNumber": "Numéro de page"
+  },
+  "thumbnails": {
+    "thumbnailsLabel": "Miniatures des pages",
+    "pageLabel": "Page {number}"
   },
   "search": {
     "searchLabel": "Recherche dans le document",

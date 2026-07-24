@@ -1,10 +1,8 @@
 {
   "toolbar": {
     "toolbarLabel": "PDF toolbar",
-    "pageNavigation": "Page navigation",
-    "previousPage": "Previous Page",
-    "nextPage": "Next Page",
-    "pageNumber": "Page number",
+    "sidebarControls": "Sidebar controls",
+    "toggleSidebar": "Toggle page thumbnails",
     "zoomControls": "Zoom controls",
     "zoomOut": "Zoom Out",
     "zoomIn": "Zoom In",
@@ -14,6 +12,16 @@
     "print": "Print",
     "download": "Download",
     "more": "More"
+  },
+  "pagination": {
+    "paginationLabel": "Page navigation",
+    "previousPage": "Previous Page",
+    "nextPage": "Next Page",
+    "pageNumber": "Page number"
+  },
+  "thumbnails": {
+    "thumbnailsLabel": "Page thumbnails",
+    "pageLabel": "Page {number}"
   },
   "search": {
     "searchLabel": "Search in document",

@@ -1,10 +1,8 @@
 {
   "toolbar": {
     "toolbarLabel": "PDF-Werkzeugleiste",
-    "pageNavigation": "Seitennavigation",
-    "previousPage": "Vorherige Seite",
-    "nextPage": "Nächste Seite",
-    "pageNumber": "Seitenzahl",
+    "sidebarControls": "Seitenleisten-Steuerung",
+    "toggleSidebar": "Seitenminiaturen ein-/ausblenden",
     "zoomControls": "Zoomsteuerung",
     "zoomOut": "Verkleinern",
     "zoomIn": "Vergrößern",
@@ -14,6 +12,16 @@
     "print": "Drucken",
     "download": "Herunterladen",
     "more": "Mehr"
+  },
+  "pagination": {
+    "paginationLabel": "Seitennavigation",
+    "previousPage": "Vorherige Seite",
+    "nextPage": "Nächste Seite",
+    "pageNumber": "Seitenzahl"
+  },
+  "thumbnails": {
+    "thumbnailsLabel": "Seitenminiaturen",
+    "pageLabel": "Seite {number}"
   },
   "search": {
     "searchLabel": "Im Dokument suchen",
