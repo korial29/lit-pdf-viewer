@@ -4,8 +4,12 @@
   "license": "Apache-2.0",
   "version": "1.1.0",
   "files": [
-    "dist"
+    "dist",
+    "scripts/install-assets.mjs"
   ],
+  "bin": {
+    "lit-pdf-viewer-install": "scripts/install-assets.mjs"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/korial29/lit-pdf-viewer.git"
