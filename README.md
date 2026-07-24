@@ -111,6 +111,45 @@ menu so the whole bar fits in one row.
 | `searchQueries`   | `string[]` | `[]`     | List of phrases to highlight in the document (multi-phrase search).        |
 | `entireWord`      | `boolean`  | `false`  | When `true`, search matches whole words only.                              |
 | `loaded`          | `boolean`  | `false`  | Reflects `true` once the document is fully loaded. Read-only, reflected as an attribute. |
+| `locale`          | `string`   | —        | Forces the UI language (`'en'`, `'fr'`, `'es'`, or `'de'`). Defaults to the browser's language, falling back to English if unsupported. |
+| `translations`    | `object`   | `{}`     | Overrides individual translation strings, grouped by namespace (`toolbar`, `search`, `error`, `viewer`). Merged on top of the resolved locale. |
+
+---
+
+## Internationalization (i18n)
+
+The toolbar, search bar, error panel, and loading indicator are translated out
+of the box in English, French, Spanish, and German. The language is picked
+automatically from the browser (`navigator.language`), with English as the
+fallback for unsupported languages.
+
+```html
+<!-- Uses the browser's language automatically -->
+<lit-pdf-viewer src="doc.pdf"></lit-pdf-viewer>
+```
+
+Force a specific language with the `locale` property:
+
+```html
+<lit-pdf-viewer src="doc.pdf" locale="es"></lit-pdf-viewer>
+```
+
+Override individual strings (or add a language of your own) with
+`translations`. Only the keys you provide are overridden — everything else
+falls back to the resolved locale:
+
+```ts
+html`
+  <lit-pdf-viewer
+    src="doc.pdf"
+    locale="en"
+    .translations=${{
+      toolbar: { print: 'Print document' },
+      search: { placeholder: 'Find in this document...' },
+    }}
+  ></lit-pdf-viewer>
+`;
+```
 
 ---
 
@@ -192,6 +231,7 @@ lit-pdf-viewer[loaded] {
 - [x] Download
 - [x] Print (with optional separate print source)
 - [x] Accessibility
+- [x] Internationalization (English, French, Spanish, German — with browser detection and overrides)
 
 ---
 

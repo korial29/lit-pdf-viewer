@@ -3,6 +3,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import '../lit-icon/lit-icon';
 import '../lit-input/lit-input';
 import { LitInput } from '../lit-input/lit-input';
+import { getTranslations, SearchTranslations } from '../i18n/i18n';
 
 // @ts-ignore
 import style from './lit-pdf-search.scss';
@@ -27,6 +28,12 @@ export class LitPdfSearch extends LitElement {
   /** Prefills the input, e.g. with the terms already highlighted via `searchQueries`. */
   @property({ type: String }) public query = '';
 
+  /** Locale to translate the search bar into (defaults to the browser's language). */
+  @property({ type: String }) public locale: string;
+
+  /** Overrides for individual translation strings. */
+  @property({ type: Object }) public translations: Partial<SearchTranslations> = {};
+
   @query('lit-input') private _inputEl: LitInput;
 
   @state() private _query = '';
@@ -37,11 +44,15 @@ export class LitPdfSearch extends LitElement {
     return [style];
   }
 
+  private get _t(): SearchTranslations {
+    return getTranslations(this.locale, { search: this.translations }).search;
+  }
+
   public connectedCallback(): void {
     super.connectedCallback();
 
     this.setAttribute('role', 'search');
-    this.setAttribute('aria-label', 'Recherche dans le document');
+    this.setAttribute('aria-label', this._t.searchLabel);
 
     // Bound to the host (not a specific child) so Escape/Enter work no
     // matter which control inside the bar currently has focus — a listener
@@ -64,11 +75,12 @@ export class LitPdfSearch extends LitElement {
 
   public render(): TemplateResult {
     const hasQuery = this._query.length > 0;
+    const t = this._t;
 
     return html`
       <lit-input
-        label="Rechercher dans le document"
-        placeholder="Rechercher..."
+        label=${t.inputLabel}
+        placeholder=${t.placeholder}
         .value=${this._query}
         clearable
         @input=${this._handleInput}
@@ -80,12 +92,12 @@ export class LitPdfSearch extends LitElement {
         aria-atomic="true"
         ?hidden=${!hasQuery}
       >
-        ${this.notFound ? 'Aucun résultat' : `${this.currentMatch} / ${this.matchCount}`}
+        ${this.notFound ? t.noResults : `${this.currentMatch} / ${this.matchCount}`}
       </span>
       <button
         class="searchButton"
-        title="Précédent"
-        aria-label="Précédent"
+        title=${t.previous}
+        aria-label=${t.previous}
         ?disabled=${!hasQuery || !this.matchCount}
         @click=${this._handlePrevious}
       >
@@ -93,14 +105,19 @@ export class LitPdfSearch extends LitElement {
       </button>
       <button
         class="searchButton"
-        title="Suivant"
-        aria-label="Suivant"
+        title=${t.next}
+        aria-label=${t.next}
         ?disabled=${!hasQuery || !this.matchCount}
         @click=${this._handleNext}
       >
         <lit-icon icon="chevron-down"></lit-icon>
       </button>
-      <button class="searchButton" title="Fermer" aria-label="Fermer" @click=${this._handleClose}>
+      <button
+        class="searchButton"
+        title=${t.close}
+        aria-label=${t.close}
+        @click=${this._handleClose}
+      >
         <lit-icon icon="cross"></lit-icon>
       </button>
     `;
@@ -115,6 +132,9 @@ export class LitPdfSearch extends LitElement {
     if (_changedProperties.has('open') && this.open) {
       this._inputEl?.focus();
       this._inputEl?.select();
+    }
+    if (_changedProperties.has('locale') || _changedProperties.has('translations')) {
+      this.setAttribute('aria-label', this._t.searchLabel);
     }
   }
 

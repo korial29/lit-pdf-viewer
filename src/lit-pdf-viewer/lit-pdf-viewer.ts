@@ -32,6 +32,7 @@ import '../lit-pdf-search/lit-pdf-search';
 import PdfPrintService from '../helpers/print';
 
 import { IErrorInfo } from '../types/error';
+import { getTranslations, Translations, TranslationsOverride } from '../i18n/i18n';
 
 // @ts-ignore
 import style from './lit-pdf-viewer.scss';
@@ -78,6 +79,12 @@ export class LitPdfViewer extends LitElement {
    * be opened at any time with the Ctrl+F / Cmd+F shortcut.
    */
   @property({ type: Boolean, reflect: true }) public isSearchBarDisplayed = false;
+
+  /** Locale to translate the UI into (defaults to the browser's language). */
+  @property({ type: String }) public locale: string;
+
+  /** Overrides for individual translation strings, per namespace. */
+  @property({ type: Object }) public translations: TranslationsOverride = {};
 
   @query('#viewerContainer') private _viewerContainer: HTMLDivElement;
 
@@ -140,6 +147,10 @@ export class LitPdfViewer extends LitElement {
     return this._pdfViewer.currentPageNumber;
   }
 
+  private get _t(): Translations {
+    return getTranslations(this.locale, this.translations);
+  }
+
   public set page(val) {
     this._pdfViewer.currentPageNumber = val;
   }
@@ -169,6 +180,8 @@ export class LitPdfViewer extends LitElement {
   }
 
   public render(): TemplateResult {
+    const t = this._t;
+
     return html`<header>
         <slot
           name="toolbar"
@@ -183,7 +196,12 @@ export class LitPdfViewer extends LitElement {
           @print=${this._handlePrint}
           @download=${this._handleDownload}
         >
-          <lit-pdf-toolbar isDownloadDisabled isPrintDisabled></lit-pdf-toolbar
+          <lit-pdf-toolbar
+            isDownloadDisabled
+            isPrintDisabled
+            locale=${this.locale}
+            .translations=${this.translations?.toolbar}
+          ></lit-pdf-toolbar
         ></slot>
 
         <slot
@@ -199,6 +217,8 @@ export class LitPdfViewer extends LitElement {
             matchCount=${this._searchMatchCount}
             currentMatch=${this._searchCurrentMatch}
             ?notFound=${this._searchNotFound}
+            locale=${this.locale}
+            .translations=${this.translations?.search}
           ></lit-pdf-search
         ></slot>
       </header>
@@ -212,7 +232,9 @@ export class LitPdfViewer extends LitElement {
       <slot name="loading">
         <div class="modal">
           <div class="modalContent">
-            <span class="loadingText">Chargement : ${this._loadingPercent}%</span>
+            <span class="loadingText"
+              >${t.viewer.loading.replace('{percent}', `${this._loadingPercent}`)}</span
+            >
             <div id="loadingBar" class="loadingBar">
               <div class="progress" style="width: ${this._loadingPercent}%"></div>
             </div>
@@ -225,6 +247,8 @@ export class LitPdfViewer extends LitElement {
           <lit-pdf-error
             errorMessage=${this._errorMessage}
             errorMoreInfo=${this._errorMoreInfo}
+            locale=${this.locale}
+            .translations=${this.translations?.error}
           ></lit-pdf-error>
         </slot>
       </section> `;
@@ -314,38 +338,40 @@ export class LitPdfViewer extends LitElement {
 
   private _handleError(exception: InvalidPDFException | ResponseException): void {
     const message = exception?.message;
+    const errorTranslations = this._t.error;
     let loadingErrorMessage: string;
 
     if (exception instanceof InvalidPDFException) {
-      loadingErrorMessage = 'Invalid or corrupted PDF file.';
+      loadingErrorMessage = errorTranslations.invalidPdf;
     } else if (exception instanceof ResponseException && exception.missing) {
       // special message for missing PDFs (e.g. HTTP 404)
-      loadingErrorMessage = 'Missing PDF file.';
+      loadingErrorMessage = errorTranslations.missingPdf;
     } else if (exception instanceof ResponseException) {
-      loadingErrorMessage = 'Unexpected server response.';
+      loadingErrorMessage = errorTranslations.unexpectedResponse;
     } else {
-      loadingErrorMessage = 'An error occurred while loading the PDF.';
+      loadingErrorMessage = errorTranslations.genericError;
     }
 
     this.error(loadingErrorMessage, <IErrorInfo>{ message });
   }
 
   private error(message: string, moreInfo: IErrorInfo): void {
+    const errorTranslations = this._t.error;
     const moreInfoText = [`PDF.js v${version || '?'} (build: ${build || '?'})`];
 
     this._errorMessage = message;
     this._toggleErrorPanel({ open: true });
 
     if (moreInfo) {
-      moreInfoText.push(`Message: ${moreInfo.message}`);
+      moreInfoText.push(`${errorTranslations.messageLabel}: ${moreInfo.message}`);
       if (moreInfo.stack) {
-        moreInfoText.push(`Stack: ${moreInfo.stack}`);
+        moreInfoText.push(`${errorTranslations.stackLabel}: ${moreInfo.stack}`);
       } else {
         if (moreInfo.filename) {
-          moreInfoText.push(`File: ${moreInfo.filename}`);
+          moreInfoText.push(`${errorTranslations.fileLabel}: ${moreInfo.filename}`);
         }
         if (moreInfo.lineNumber) {
-          moreInfoText.push(`Line: ${moreInfo.lineNumber}`);
+          moreInfoText.push(`${errorTranslations.lineLabel}: ${moreInfo.lineNumber}`);
         }
       }
     }
