@@ -2,8 +2,8 @@
 
 :host {
   .errorWrapper {
-    background: none repeat scroll 0 0 rgba(255, 85, 85, 1);
-    color: rgba(255, 255, 255, 1);
+    background: none repeat scroll 0 0 var(--litpdf-error-background, rgba(255, 85, 85, 1));
+    color: var(--litpdf-error-color, rgba(255, 255, 255, 1));
     left: 0;
     position: absolute;
     right: 0;
@@ -27,8 +27,8 @@
   }
 
   .errorMoreInfo {
-    background-color: rgba(255, 255, 255, 1);
-    color: rgba(0, 0, 0, 1);
+    background-color: var(--litpdf-surface-background, rgba(255, 255, 255, 1));
+    color: var(--litpdf-text-color, rgba(0, 0, 0, 1));
     padding: 0.3rem;
     margin-top: 0.6rem;
     width: 100%;
@@ -46,7 +46,7 @@
     cursor: pointer;
 
     lit-icon {
-      color: #fff;
+      color: var(--litpdf-error-color, #fff);
     }
   }
 

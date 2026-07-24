@@ -3,7 +3,7 @@
 :host {
   --page-margin: 1px auto -8px;
   --page-border: 9px solid transparent;
-  --highlight-color: rgb(255 247 0 / 0.4);
+  --highlight-color: var(--litpdf-highlight-color, rgb(255 247 0 / 0.4));
 
   // Fill the space the host is given and lay the toolbar + scroll area out as
   // a column. The consumer is responsible for sizing the host (e.g. height).
@@ -237,8 +237,8 @@
 
     .modalContent {
       padding: 24px;
-      box-shadow: $shadow;
-      background-color: #fff;
+      box-shadow: var(--litpdf-surface-shadow, #{$shadow});
+      background-color: var(--litpdf-surface-background, #fff);
       border-radius: 8px;
       margin: 0 auto;
     }
@@ -263,7 +263,7 @@
       padding: 4px;
       border-radius: 12px;
       font-size: 0.6rem;
-      background-color: #{map-get($primary-color, 'medium')};
+      background-color: var(--litpdf-accent-color, #{map-get($primary-color, 'medium')});
       transition: width 200ms;
     }
   }

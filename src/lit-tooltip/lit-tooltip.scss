@@ -19,8 +19,8 @@
   padding: 4px 8px;
   white-space: nowrap;
   font-size: 0.75rem;
-  color: #fff;
-  background-color: #{map-get($primary-color-2, 'normal')};
+  color: var(--litpdf-tooltip-color, #fff);
+  background-color: var(--litpdf-tooltip-background, #{map-get($primary-color-2, 'normal')});
   border-radius: 4px;
   pointer-events: none;
 }

@@ -3,9 +3,12 @@
 :host {
   --button-width: 26px;
   --button-height: 26px;
-  --button-border-hover: #{map-get($primary-color, 'medium')};
-  --button-background-hover: color-mix(in srgb, #{map-get($primary-color, 'medium')} 12%, transparent);
-  --button-focus-ring: #{map-get($primary-color, 'medium')};
+  --button-border-hover: var(--litpdf-button-border-hover, #{map-get($primary-color, 'medium')});
+  --button-background-hover: var(
+    --litpdf-button-background-hover,
+    color-mix(in srgb, #{map-get($primary-color, 'medium')} 12%, transparent)
+  );
+  --button-focus-ring: var(--litpdf-focus-ring-color, #{map-get($primary-color, 'medium')});
 
   display: none;
   position: absolute;
@@ -15,11 +18,12 @@
   gap: 8px;
   padding: 8px 14px;
   margin-top: 6px;
-  background-color: #fff;
+  background-color: var(--litpdf-surface-background, #fff);
   border-radius: 6px;
-  box-shadow: $shadow;
+  box-shadow: var(--litpdf-surface-shadow, #{$shadow});
   z-index: 500;
   box-sizing: border-box;
+  color: var(--litpdf-icon-color, #{map-get($primary-color-2, 'normal')});
 }
 
 :host([open]) {
@@ -33,7 +37,7 @@ lit-input {
 
 .matchCount {
   font-size: 0.75rem;
-  color: #{map-get($primary-color-2, '75')};
+  color: var(--litpdf-text-color-muted, #{map-get($primary-color-2, '75')});
   white-space: nowrap;
 }
 
@@ -49,6 +53,10 @@ lit-input {
   outline: 0;
   border-radius: 4px;
   background-color: transparent;
+  // `<button>` doesn't inherit `color` from an ancestor like normal elements
+  // do (it uses the UA's `buttontext` by default), so `--litpdf-icon-color`
+  // set on `:host` would otherwise never reach the icon.
+  color: inherit;
   box-sizing: border-box;
   cursor: pointer;
 
@@ -62,7 +70,7 @@ lit-input {
     background-color: var(--button-background-hover);
 
     lit-icon {
-      color: #{map-get($primary-color, 'medium')};
+      color: var(--litpdf-icon-color-hover, #{map-get($primary-color, 'medium')});
     }
   }
 
