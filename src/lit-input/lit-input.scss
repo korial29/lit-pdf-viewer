@@ -3,11 +3,11 @@
 :host {
   --input-height: 32px;
   --input-radius: 6px;
-  --input-border: #{map-get($primary-color-2, '50')};
-  --input-border-hover: #{map-get($primary-color-2, '75')};
-  --input-focus-ring: #{map-get($primary-color, 'medium')};
-  --input-color: #{map-get($primary-color-2, 'normal')};
-  --input-placeholder-color: #{map-get($primary-color-2, '75')};
+  --input-border: var(--litpdf-border-color, #{map-get($primary-color-2, '50')});
+  --input-border-hover: var(--litpdf-border-color-hover, #{map-get($primary-color-2, '75')});
+  --input-focus-ring: var(--litpdf-focus-ring-color, #{map-get($primary-color, 'medium')});
+  --input-color: var(--litpdf-text-color, #{map-get($primary-color-2, 'normal')});
+  --input-placeholder-color: var(--litpdf-text-color-muted, #{map-get($primary-color-2, '75')});
 
   display: block;
 }
@@ -42,7 +42,7 @@ input {
   outline: none;
   font-size: 0.85rem;
   color: var(--input-color);
-  background-color: #fff;
+  background-color: var(--litpdf-surface-background, #fff);
   transition:
     border-color 120ms,
     box-shadow 120ms;
@@ -94,7 +94,7 @@ input {
   }
 
   &:hover {
-    background-color: #{map-get($primary-color-2, '25')};
+    background-color: var(--litpdf-surface-background-hover, #{map-get($primary-color-2, '25')});
     color: var(--input-color);
   }
 

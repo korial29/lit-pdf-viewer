@@ -14,9 +14,9 @@
   display: none;
   flex-direction: column;
   padding: 4px;
-  background-color: #fff;
+  background-color: var(--litpdf-surface-background, #fff);
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+  box-shadow: var(--litpdf-surface-shadow, 0 2px 8px rgb(0 0 0 / 0.15));
 }
 
 .content[data-align='left'] {

@@ -144,6 +144,51 @@ html`
 
 ---
 
+## Theming
+
+Every visual surface — the toolbar background, buttons, icons, borders, the
+search bar, tooltips, popovers, and the error banner — is driven by CSS custom
+properties with sensible defaults baked in. Set the ones you want to override
+on `lit-pdf-viewer` (or any ancestor, e.g. `:root`); they inherit down through
+every nested shadow root automatically.
+
+```css
+lit-pdf-viewer {
+  --litpdf-toolbar-background: #1e1e1e;
+  --litpdf-icon-color: #eee;
+  --litpdf-accent-color: #ff6b35;
+  --litpdf-surface-background: #2a2a2a;
+  --litpdf-text-color: #eee;
+}
+```
+
+| Variable                            | Default                            | Affects                                                     |
+|--------------------------------------|-------------------------------------|--------------------------------------------------------------|
+| `--litpdf-accent-color`              | `#5f49d1`                          | Button hover borders, focus rings, loading bar               |
+| `--litpdf-focus-ring-color`          | `var(--litpdf-accent-color)`       | Keyboard focus ring on buttons and inputs                    |
+| `--litpdf-toolbar-background`        | `#fff`                             | Toolbar (header) background                                  |
+| `--litpdf-toolbar-shadow`            | `0 1px 3px rgba(30, 16, 106, .15)` | Toolbar drop shadow                                           |
+| `--litpdf-button-background`         | `transparent`                      | Toolbar/search button background (idle)                      |
+| `--litpdf-button-background-hover`   | tinted accent                      | Toolbar/search button background (hover)                     |
+| `--litpdf-button-border-hover`       | `var(--litpdf-accent-color)`       | Toolbar/search button border (hover)                         |
+| `--litpdf-button-radius`             | `4px`                              | Toolbar button corner radius                                 |
+| `--litpdf-icon-color`                | `#222`                             | Default icon/text color in the toolbar and search bar        |
+| `--litpdf-icon-color-hover`          | `#737373` (toolbar) / accent (search) | Icon color on button hover                                |
+| `--litpdf-text-color`                | `#222`                             | Primary text (input values, error "more info" text)          |
+| `--litpdf-text-color-muted`          | `#737373`                          | Secondary text (page count, match count, placeholders)        |
+| `--litpdf-border-color`              | `#ccc`                             | Separators, page-number field, input borders                 |
+| `--litpdf-border-color-hover`        | `#737373`                          | Borders on hover                                              |
+| `--litpdf-surface-background`        | `#fff`                             | Search bar, popovers, inputs, modal                           |
+| `--litpdf-surface-background-hover`  | `#eee`                             | Subtle hover surfaces (e.g. the input's clear button)         |
+| `--litpdf-surface-shadow`            | `2px 2px 3px rgba(30, 16, 106, .25)` | Search bar, popovers, modal drop shadow                     |
+| `--litpdf-tooltip-background`        | `#222`                             | Tooltip background                                            |
+| `--litpdf-tooltip-color`             | `#fff`                             | Tooltip text                                                  |
+| `--litpdf-error-background`          | `#ff5555`                          | Error banner background                                       |
+| `--litpdf-error-color`               | `#fff`                             | Error banner text and icons                                   |
+| `--highlight-color`                  | `rgb(255 247 0 / 0.4)`             | Search-match highlight color (set on `lit-pdf-viewer` itself, no `--litpdf-` prefix — kept for backward compatibility) |
+
+---
+
 ## Examples
 
 ### Authenticated PDF
