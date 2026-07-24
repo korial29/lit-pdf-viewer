@@ -26,6 +26,7 @@ import { removeAccents } from '../helpers/remove-accents';
 // Components
 import '../lit-pdf-toolbar/lit-pdf-toolbar';
 import '../lit-pdf-pagination/lit-pdf-pagination';
+import '../lit-pdf-thumbnails/lit-pdf-thumbnails';
 import '../lit-pdf-error/lit-pdf-error';
 import '../lit-pdf-search/lit-pdf-search';
 
@@ -113,6 +114,10 @@ export class LitPdfViewer extends LitElement {
 
   @state() private _paginationVisible = false;
 
+  @state() private _sidebarOpen = false;
+
+  @state() private _currentPage = 1;
+
   private _searchQueriesNormalized: string[];
 
   private _pageNumberEl: HTMLInputElement;
@@ -196,6 +201,7 @@ export class LitPdfViewer extends LitElement {
         <slot
           name="toolbar"
           @toolbarConnected=${this._handleToolbarConnected}
+          @toggleSidebar=${this._handleToggleSidebar}
           @zoomIn=${this._handleZoomIn}
           @zoomOut=${this._handleZoomOut}
           @rotateCw=${this._handleRotateCw}
@@ -206,6 +212,7 @@ export class LitPdfViewer extends LitElement {
           <lit-pdf-toolbar
             isDownloadDisabled
             isPrintDisabled
+            ?isSidebarOpen=${this._sidebarOpen}
             locale=${this.locale}
             .translations=${this.translations?.toolbar}
           ></lit-pdf-toolbar
@@ -230,20 +237,31 @@ export class LitPdfViewer extends LitElement {
         ></slot>
       </header>
 
-      <div class="viewerWrapper">
-        <div id="viewerContainer">
-          <div id="viewer" class="pdfViewer"></div>
-        </div>
-
-        <lit-pdf-pagination
-          ?visible=${this._paginationVisible}
+      <div class="contentWrapper">
+        <lit-pdf-thumbnails
+          ?open=${this._sidebarOpen}
+          .pdfDocument=${this._pdfDocument}
+          .currentPage=${this._currentPage}
           locale=${this.locale}
-          .translations=${this.translations?.pagination}
-          @paginationConnected=${this._handlePaginationConnected}
-          @previousPage=${this._handlePrevious}
-          @nextPage=${this._handleNext}
-          @pageChange=${this._handlePageChange}
-        ></lit-pdf-pagination>
+          .translations=${this.translations?.thumbnails}
+          @thumbnailSelect=${this._handleThumbnailSelect}
+        ></lit-pdf-thumbnails>
+
+        <div class="viewerWrapper">
+          <div id="viewerContainer">
+            <div id="viewer" class="pdfViewer"></div>
+          </div>
+
+          <lit-pdf-pagination
+            ?visible=${this._paginationVisible}
+            locale=${this.locale}
+            .translations=${this.translations?.pagination}
+            @paginationConnected=${this._handlePaginationConnected}
+            @previousPage=${this._handlePrevious}
+            @nextPage=${this._handleNext}
+            @pageChange=${this._handlePageChange}
+          ></lit-pdf-pagination>
+        </div>
       </div>
 
       <slot name="loading">
@@ -465,6 +483,7 @@ export class LitPdfViewer extends LitElement {
         this._pageNumberEl.value = page;
         this._previousPageEl.disabled = page <= 1;
         this._nextPageEl.disabled = page >= this.pagesCount;
+        this._currentPage = page;
       },
       true,
     );
@@ -512,6 +531,21 @@ export class LitPdfViewer extends LitElement {
 
   private _handleRotateCcw(): void {
     this._pdfViewer.pagesRotation -= 90;
+  }
+
+  private _handleToggleSidebar(): void {
+    this._sidebarOpen = !this._sidebarOpen;
+  }
+
+  private _handleThumbnailSelect(e: CustomEvent<{ pageNumber: number }>): void {
+    this.page = e.detail.pageNumber;
+
+    // On narrow screens the sidebar overlays the document instead of sharing
+    // the row with it, so close it once a page has been picked to reveal
+    // what was just navigated to.
+    if (window.matchMedia('(max-width: 600px)').matches) {
+      this._sidebarOpen = false;
+    }
   }
 
   private _handlePrevious(): void {

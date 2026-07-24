@@ -5,6 +5,8 @@ import de from './de.json';
 
 export interface ToolbarTranslations {
   toolbarLabel: string;
+  sidebarControls: string;
+  toggleSidebar: string;
   zoomControls: string;
   zoomOut: string;
   zoomIn: string;
@@ -21,6 +23,11 @@ export interface PaginationTranslations {
   previousPage: string;
   nextPage: string;
   pageNumber: string;
+}
+
+export interface ThumbnailsTranslations {
+  thumbnailsLabel: string;
+  pageLabel: string;
 }
 
 export interface SearchTranslations {
@@ -54,6 +61,7 @@ export interface ViewerTranslations {
 export interface Translations {
   toolbar: ToolbarTranslations;
   pagination: PaginationTranslations;
+  thumbnails: ThumbnailsTranslations;
   search: SearchTranslations;
   error: ErrorTranslations;
   viewer: ViewerTranslations;

@@ -50,6 +50,11 @@
     letter-spacing: 1px;
   }
 
+  .sidebarIcon {
+    font-size: 16px;
+    line-height: 1;
+  }
+
   .separator {
     height: 50%;
     width: 1px;
@@ -97,6 +102,13 @@
     // the viewer host's `overflow: hidden`.
     &:focus-visible {
       box-shadow: 0 0 0 2px var(--button-focus-ring);
+    }
+
+    // Toggle buttons (e.g. the sidebar toggle) reuse the hover treatment to
+    // show they're "pressed" while their panel is open.
+    &[aria-expanded='true'] {
+      border-color: var(--button-border-hover);
+      background-color: var(--button-background-hover);
     }
   }
 

@@ -1,0 +1,84 @@
+@import '../../assets/style/colors.scss';
+
+:host {
+  --thumbnail-border-radius: 4px;
+
+  display: none;
+  flex: 0 0 auto;
+  flex-direction: column;
+  width: 160px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 12px 8px;
+  background-color: var(--litpdf-surface-background, #fff);
+  border-right: 1px solid var(--litpdf-border-color, #{map-get($primary-color-2, '50')});
+}
+
+:host([open]) {
+  display: flex;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.thumbnail {
+  display: flex;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: var(--thumbnail-border-radius);
+  background: transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  outline: 0;
+
+  &:hover {
+    border-color: var(--litpdf-button-border-hover, #{map-get($primary-color, 'medium')});
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--litpdf-focus-ring-color, #{map-get($primary-color, 'medium')});
+  }
+
+  &[data-current] {
+    border-color: var(--litpdf-accent-color, #{map-get($primary-color, 'medium')});
+  }
+}
+
+.canvas {
+  display: block;
+  background-color: #fff;
+  box-shadow: var(--litpdf-surface-shadow, #{$shadow});
+}
+
+.pageNumber {
+  font-size: 0.7rem;
+  color: var(--litpdf-text-color-muted, #{map-get($primary-color-2, '75')});
+}
+
+// On small screens a fixed-width sidebar would leave no room for the
+// document itself, so it overlays the viewer as a drawer instead of sharing
+// the row with it.
+@media (max-width: 600px) {
+  :host([open]) {
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 600;
+    width: 75vw;
+    max-width: 260px;
+    box-shadow: var(--litpdf-surface-shadow, #{$shadow});
+  }
+}

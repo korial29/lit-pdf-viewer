@@ -1,6 +1,8 @@
 {
   "toolbar": {
     "toolbarLabel": "PDF toolbar",
+    "sidebarControls": "Sidebar controls",
+    "toggleSidebar": "Toggle page thumbnails",
     "zoomControls": "Zoom controls",
     "zoomOut": "Zoom Out",
     "zoomIn": "Zoom In",
@@ -16,6 +18,10 @@
     "previousPage": "Previous Page",
     "nextPage": "Next Page",
     "pageNumber": "Page number"
+  },
+  "thumbnails": {
+    "thumbnailsLabel": "Page thumbnails",
+    "pageLabel": "Page {number}"
   },
   "search": {
     "searchLabel": "Search in document",

@@ -1,6 +1,8 @@
 {
   "toolbar": {
     "toolbarLabel": "Barre d'outils PDF",
+    "sidebarControls": "Contrôles du panneau latéral",
+    "toggleSidebar": "Afficher/masquer les miniatures des pages",
     "zoomControls": "Contrôles de zoom",
     "zoomOut": "Zoom arrière",
     "zoomIn": "Zoom avant",
@@ -16,6 +18,10 @@
     "previousPage": "Page précédente",
     "nextPage": "Page suivante",
     "pageNumber": "Numéro de page"
+  },
+  "thumbnails": {
+    "thumbnailsLabel": "Miniatures des pages",
+    "pageLabel": "Page {number}"
   },
   "search": {
     "searchLabel": "Recherche dans le document",

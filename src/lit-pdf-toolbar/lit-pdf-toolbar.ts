@@ -14,6 +14,8 @@ export class LitPdfToolbar extends LitElement {
 
   @property({ type: Boolean }) public isDownloadDisabled: boolean;
 
+  @property({ type: Boolean }) public isSidebarOpen: boolean;
+
   /** Locale to translate the toolbar into (defaults to the browser's language). */
   @property({ type: String }) public locale: string;
 
@@ -39,6 +41,21 @@ export class LitPdfToolbar extends LitElement {
     const t = this._t;
 
     return html`
+      <section class="container" role="group" aria-label=${t.sidebarControls}>
+        <lit-tooltip text=${t.toggleSidebar}>
+          <button
+            class="toolbarButton sidebarToggle"
+            aria-label=${t.toggleSidebar}
+            aria-expanded=${this.isSidebarOpen ? 'true' : 'false'}
+            @click=${this._handleToggleSidebar}
+          >
+            <span class="sidebarIcon" aria-hidden="true">☰</span>
+          </button>
+        </lit-tooltip>
+      </section>
+
+      <span class="separator" role="separator" aria-orientation="vertical"></span>
+
       <section class="container" role="group" aria-label=${t.zoomControls}>
         <lit-tooltip text=${t.zoomOut}>
           <button
@@ -152,6 +169,10 @@ export class LitPdfToolbar extends LitElement {
 
   protected firstUpdated(): void {
     this.dispatchEvent(new CustomEvent('toolbarConnected', { bubbles: true }));
+  }
+
+  private _handleToggleSidebar(): void {
+    this.dispatchEvent(new CustomEvent('toggleSidebar', { bubbles: true }));
   }
 
   private _handleZoomIn(): void {

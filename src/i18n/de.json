@@ -1,6 +1,8 @@
 {
   "toolbar": {
     "toolbarLabel": "PDF-Werkzeugleiste",
+    "sidebarControls": "Seitenleisten-Steuerung",
+    "toggleSidebar": "Seitenminiaturen ein-/ausblenden",
     "zoomControls": "Zoomsteuerung",
     "zoomOut": "Verkleinern",
     "zoomIn": "Vergrößern",
@@ -16,6 +18,10 @@
     "previousPage": "Vorherige Seite",
     "nextPage": "Nächste Seite",
     "pageNumber": "Seitenzahl"
+  },
+  "thumbnails": {
+    "thumbnailsLabel": "Seitenminiaturen",
+    "pageLabel": "Seite {number}"
   },
   "search": {
     "searchLabel": "Im Dokument suchen",
