@@ -25,6 +25,7 @@ import { removeAccents } from '../helpers/remove-accents';
 
 // Components
 import '../lit-pdf-toolbar/lit-pdf-toolbar';
+import '../lit-pdf-pagination/lit-pdf-pagination';
 import '../lit-pdf-error/lit-pdf-error';
 import '../lit-pdf-search/lit-pdf-search';
 
@@ -45,6 +46,7 @@ const MAX_SCALE = 10.0;
 const MAX_IMAGE_SIZE = 1024 * 1024;
 const CMAP_URL = 'pdfjs-dist/cmaps/';
 const CMAP_PACKED = true;
+const PAGINATION_HIDE_DELAY = 5000;
 
 @customElement('lit-pdf-viewer')
 export class LitPdfViewer extends LitElement {
@@ -109,6 +111,8 @@ export class LitPdfViewer extends LitElement {
 
   @state() private _openErrorPanel: boolean;
 
+  @state() private _paginationVisible = false;
+
   private _searchQueriesNormalized: string[];
 
   private _pageNumberEl: HTMLInputElement;
@@ -118,6 +122,10 @@ export class LitPdfViewer extends LitElement {
   private _nextPageEl: HTMLButtonElement;
 
   private _toolbarEl: HTMLElement;
+
+  private _paginationEl: HTMLElement;
+
+  private _paginationHideTimeout: ReturnType<typeof setTimeout>;
 
   private _pdfLoadingTask: PDFDocumentLoadingTask;
 
@@ -177,6 +185,8 @@ export class LitPdfViewer extends LitElement {
 
     window.removeEventListener('resize', this._handleWindowResise);
     window.removeEventListener('keydown', this._handleGlobalKeydown);
+    this._viewerContainer?.removeEventListener('scroll', this._handleViewerScroll);
+    clearTimeout(this._paginationHideTimeout);
   }
 
   public render(): TemplateResult {
@@ -190,9 +200,6 @@ export class LitPdfViewer extends LitElement {
           @zoomOut=${this._handleZoomOut}
           @rotateCw=${this._handleRotateCw}
           @rotateCcw=${this._handleRotateCcw}
-          @previousPage=${this._handlePrevious}
-          @nextPage=${this._handleNext}
-          @pageChange=${this._handlePageChange}
           @print=${this._handlePrint}
           @download=${this._handleDownload}
         >
@@ -227,6 +234,16 @@ export class LitPdfViewer extends LitElement {
         <div id="viewerContainer">
           <div id="viewer" class="pdfViewer"></div>
         </div>
+
+        <lit-pdf-pagination
+          ?visible=${this._paginationVisible}
+          locale=${this.locale}
+          .translations=${this.translations?.pagination}
+          @paginationConnected=${this._handlePaginationConnected}
+          @previousPage=${this._handlePrevious}
+          @nextPage=${this._handleNext}
+          @pageChange=${this._handlePageChange}
+        ></lit-pdf-pagination>
       </div>
 
       <slot name="loading">
@@ -256,6 +273,7 @@ export class LitPdfViewer extends LitElement {
 
   protected firstUpdated(): void {
     this.initViewer();
+    this._viewerContainer.addEventListener('scroll', this._handleViewerScroll);
   }
 
   protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -324,7 +342,7 @@ export class LitPdfViewer extends LitElement {
       this._pdfViewer.setDocument(this._pdfDocument);
       this._pdfLinkService.setDocument(this._pdfDocument);
       this._pdfFindController.setDocument(this._pdfDocument);
-      this._toolbarEl.setAttribute('pageCount', `${this.pagesCount}`);
+      this._paginationEl.setAttribute('pageCount', `${this.pagesCount}`);
       this._toolbarEl.toggleAttribute('isDownloadDisabled', false);
       this._toolbarEl.toggleAttribute('isPrintDisabled', false);
       this.loaded = true;
@@ -548,10 +566,22 @@ export class LitPdfViewer extends LitElement {
 
   private _handleToolbarConnected(e: CustomEvent): void {
     this._toolbarEl = <HTMLElement>e.target;
+  }
+
+  private _handlePaginationConnected(e: CustomEvent): void {
+    this._paginationEl = <HTMLElement>e.target;
     this._pageNumberEl = e.detail.pageNumberEl;
     this._previousPageEl = e.detail.previousPageEl;
     this._nextPageEl = e.detail.nextPageEl;
   }
+
+  private _handleViewerScroll = (): void => {
+    this._paginationVisible = true;
+    clearTimeout(this._paginationHideTimeout);
+    this._paginationHideTimeout = setTimeout(() => {
+      this._paginationVisible = false;
+    }, PAGINATION_HIDE_DELAY);
+  };
 
   private _handleGlobalKeydown = (e: KeyboardEvent): void => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'f') {

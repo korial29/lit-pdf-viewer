@@ -14,7 +14,6 @@
   --button-focus-ring: var(--litpdf-focus-ring-color, #{map-get($primary-color, 'medium')});
   --toolbar-color: var(--litpdf-toolbar-background, #fff);
   --toolbar-shadow: var(--litpdf-toolbar-shadow, 0 1px 3px rgba(30, 16, 106, 0.15));
-  --pagecount-color: var(--litpdf-text-color-muted, #{map-get($primary-color-2, '75')});
   color: var(--litpdf-icon-color, #{map-get($primary-color-2, 'normal')});
 
   display: flex;
@@ -101,38 +100,11 @@
     }
   }
 
-  .pageNumber {
-    outline: none;
-    // Same border treatment as lit-input's `input` (border/hover/focus
-    // colors), so the page-number field reads as the same kind of control.
-    border: 1px solid var(--litpdf-border-color, #{map-get($primary-color-2, '50')});
-    border-radius: var(--button-radius);
-    box-sizing: border-box;
-    padding: 0 6px;
-    height: 18px;
-    width: 44px;
-    transition:
-      border-color 120ms,
-      box-shadow 120ms;
-
-    &:hover:not(:disabled) {
-      border-color: var(--litpdf-border-color-hover, #{map-get($primary-color-2, '75')});
-    }
-
-    &:focus-visible {
-      border-color: var(--button-focus-ring);
-      box-shadow: 0 0 0 2px var(--button-focus-ring);
-    }
-  }
-
-  .pageCount {
-    font-size: 0.8rem;
-  }
-
-  // On small screens the row can't hold every button, so we move the secondary
-  // actions (rotate + print + download) into the "..." overflow menu and
-  // enlarge the remaining controls to comfortable ~44px touch targets
-  // (Apple HIG minimum).
+  // On small screens the row can't hold every button, so we move the rotate
+  // actions into the "..." overflow menu (print/download stay inline — we
+  // have the room now that page navigation lives in its own floating
+  // pagination pill) and enlarge the remaining controls to comfortable ~44px
+  // touch targets (Apple HIG minimum).
   @media (max-width: 600px) {
     --button-width: 44px;
     --button-height: 44px;
@@ -144,25 +116,13 @@
       gap: 6px;
     }
 
-    // Hide the inline secondary buttons; they live in the "..." menu instead.
+    // Hide the inline rotate buttons; they live in the "..." menu instead.
     .inlineOnly {
       display: none;
     }
 
     .moreWrapper {
       display: inline-flex;
-    }
-
-    // Grow the page-number field to match the taller touch targets.
-    .pageNumber {
-      height: 34px;
-      width: 44px;
-      font-size: 1rem;
-      text-align: center;
-    }
-
-    .pageCount {
-      font-size: 1rem;
     }
   }
 
@@ -174,10 +134,5 @@
     --button-height: 40px;
 
     height: 44px;
-
-    .pageNumber {
-      height: 30px;
-      width: 40px;
-    }
   }
 }
