@@ -21,28 +21,16 @@ npm install lit-pdf-viewer
 
 ### Copy static assets
 
-The component requires three sets of static files to be served alongside your app.
-
-**1. PDF.js worker and CMaps**
-
-PDF.js offloads PDF parsing to a worker thread. CMaps (Character Maps) are needed to render CID fonts correctly.
-
-Copy the bundled `pdfjs-dist` folder into your public/bundle directory:
+The component requires the PDF.js worker, CMaps, and icon font to be served
+as static files alongside your app.
 
 ```sh
-cp -r node_modules/lit-pdf-viewer/dist/pdfjs-dist <your-public-dir>/pdfjs-dist
+npx lit-pdf-viewer-install <your-public-dir>
 ```
 
-**2. Icon font**
-
-The toolbar uses a custom icon font.
-
-```sh
-cp -r node_modules/lit-pdf-viewer/dist/fonts  <your-public-dir>/fonts
-cp -r node_modules/lit-pdf-viewer/dist/style  <your-public-dir>/style
-```
-
-Your final public directory should look like:
+Copies `pdfjs-dist`, `fonts`, and `style` into `<your-public-dir>`. Omit the
+argument and it will prompt you for the target directory. Your final public
+directory should look like:
 
 ```
 public/
@@ -53,6 +41,9 @@ public/
 ├── fonts/
 └── style/
 ```
+
+Prefer to copy them yourself? They're the same files under
+`node_modules/lit-pdf-viewer/dist/{pdfjs-dist,fonts,style}`.
 
 ---
 
