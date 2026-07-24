@@ -1,4 +1,10 @@
-import { PDFDocumentProxy, getDocument, PixelsPerInch } from 'pdfjs-dist';
+// Type-only: erased at compile time. The runtime module is loaded lazily via
+// `loadPdfjsLib()` (see load-pdfjs.ts) so pdfjs-dist stays out of this
+// module's static import graph — otherwise it would pull the whole library
+// back into the main bundle even where `lit-pdf-viewer.ts` only references it
+// through a dynamic `import()`.
+import type { PDFDocumentProxy } from 'pdfjs-dist';
+import { loadPdfjsLib, PdfjsLib } from './load-pdfjs';
 // @ts-ignore
 import printStyle from './print.scss';
 
@@ -21,6 +27,8 @@ export default class PdfPrintService {
 
   private _aborted: boolean;
 
+  private _pdfjsLib: PdfjsLib;
+
   public static getInstance(): PdfPrintService {
     if (!PdfPrintService._instance) {
       PdfPrintService._instance = new PdfPrintService();
@@ -34,6 +42,8 @@ export default class PdfPrintService {
   }
 
   public async print({ printSrc, token, pdfDocument }: IPrintParams): Promise<void> {
+    this._pdfjsLib = await loadPdfjsLib();
+
     const hasChanged = this._hasChanged(printSrc, pdfDocument);
     this._url = printSrc;
     this._pdfDocument = pdfDocument;
@@ -68,7 +78,7 @@ export default class PdfPrintService {
       let newPdfDocument = pdfDocument;
       if (!newPdfDocument) {
         const httpHeaders = token ? { Authorization: `Bearer ${token}` } : {};
-        const loadingTask = getDocument({
+        const loadingTask = this._pdfjsLib.getDocument({
           url: printSrc,
           httpHeaders,
         });
@@ -116,7 +126,7 @@ export default class PdfPrintService {
 
       // The size of the canvas in pixels for printing.
       const PRINT_RESOLUTION = 124;
-      const PRINT_UNITS = PRINT_RESOLUTION / PixelsPerInch.PDF;
+      const PRINT_UNITS = PRINT_RESOLUTION / this._pdfjsLib.PixelsPerInch.PDF;
       canvas.width = Math.floor(size.width * PRINT_UNITS);
       canvas.height = Math.floor(size.height * PRINT_UNITS);
 
