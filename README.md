@@ -7,6 +7,12 @@
 
 A [Lit](https://lit.dev) web component for displaying PDFs, built on top of Mozilla's [PDF.js](https://mozilla.github.io/pdf.js/).
 
+## Framework-agnostic, light to add
+
+`<lit-pdf-viewer>` is a native [Web Component](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) — no adapter or wrapper needed to use it. Drop it into React, Vue, Angular, Svelte, or a plain HTML page; it behaves the same everywhere because custom elements are a browser primitive, not a framework integration.
+
+Adding it to a project costs about **17 KB gzipped** (`dist/index.mjs`, `lit` runtime included) — that's the whole component before any PDF is involved. [PDF.js](https://mozilla.github.io/pdf.js/) itself (~196 KB gzipped) is loaded lazily via a dynamic `import()`, only once a `<lit-pdf-viewer>` actually connects to the page or a print is triggered, not just for having the package in your bundle.
+
 ## Live demo
 
 https://korial29.github.io/lit-pdf-viewer/

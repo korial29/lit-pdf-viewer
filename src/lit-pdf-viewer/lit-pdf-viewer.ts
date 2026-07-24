@@ -1,27 +1,25 @@
 import { CSSResult, html, TemplateResult, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import {
-  getDocument,
-  GlobalWorkerOptions,
+// Type-only: erased at compile time, so these don't pull pdfjs-dist's runtime
+// code into this module. The actual runtime values are loaded on demand by
+// `loadPdfjsModules()` below — see the comment there for why.
+import type {
+  PDFDocumentProxy,
+  PDFDocumentLoadingTask,
   InvalidPDFException,
   ResponseException,
-  PDFDocumentProxy,
-  version,
-  build,
-  PDFDocumentLoadingTask,
-  getFilenameFromUrl,
 } from 'pdfjs-dist';
-import {
+import type {
   EventBus,
   PDFLinkService,
   PDFViewer,
   PDFFindController,
   DownloadManager,
-  FindState,
 } from 'pdfjs-dist/web/pdf_viewer.mjs';
 
 // Helpers
 import { removeAccents } from '../helpers/remove-accents';
+import { loadPdfjsLib, loadPdfjsViewer, PdfjsLib } from '../helpers/load-pdfjs';
 
 // Components
 import '../lit-pdf-toolbar/lit-pdf-toolbar';
@@ -38,8 +36,6 @@ import { getTranslations, Translations, TranslationsOverride } from '../i18n/i18
 
 // @ts-ignore
 import style from './lit-pdf-viewer.scss';
-
-GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.min.mjs';
 
 const DEFAULT_SCALE_DELTA = 1.1;
 const MIN_SCALE = 0.25;
@@ -151,6 +147,11 @@ export class LitPdfViewer extends LitElement {
   private _eventBus: EventBus;
 
   private _loadingTaskPromise: Promise<PDFDocumentProxy | void>;
+
+  private _pdfjsLib: PdfjsLib;
+
+  /** Resolves once pdfjs-dist's dynamically-imported modules are loaded and `_pdfViewer` etc. are constructed. */
+  private _viewerReadyPromise: Promise<void>;
 
   public static get styles(): CSSResult[] {
     return [style];
@@ -301,7 +302,7 @@ export class LitPdfViewer extends LitElement {
   }
 
   protected firstUpdated(): void {
-    this.initViewer();
+    this._viewerReadyPromise = this.initViewer();
     this._viewerContainer.addEventListener('scroll', this._handleViewerScroll);
   }
 
@@ -318,10 +319,10 @@ export class LitPdfViewer extends LitElement {
     }
     if (_changedProperties.has('scale') && this.scale) {
       // Wait render before refresh pdfjs scale
-      setTimeout(
-        () => this._eventBus.dispatch('scalechanged', { value: this.scale }),
-        this.scaleUpdateDelay,
-      );
+      setTimeout(async () => {
+        await this._viewerReadyPromise;
+        this._eventBus.dispatch('scalechanged', { value: this.scale });
+      }, this.scaleUpdateDelay);
     }
     if (_changedProperties.has('isSearchBarDisplayed') || _changedProperties.has('searchQueries')) {
       this._searchOpen = this._shouldDisplaySearchBar();
@@ -342,6 +343,8 @@ export class LitPdfViewer extends LitElement {
    *                      is opened.
    */
   private async _open(params: { url: string }): Promise<PDFDocumentProxy | void> {
+    await this._viewerReadyPromise;
+
     if (this._pdfLoadingTask) {
       // We need to destroy already opened document
       return this.close().then(() => {
@@ -354,7 +357,7 @@ export class LitPdfViewer extends LitElement {
     this.loaded = false;
 
     // Loading document.
-    this._pdfLoadingTask = getDocument({
+    this._pdfLoadingTask = this._pdfjsLib.getDocument({
       url,
       maxImageSize: MAX_IMAGE_SIZE,
       cMapUrl: CMAP_URL,
@@ -388,12 +391,12 @@ export class LitPdfViewer extends LitElement {
     const errorTranslations = this._t.error;
     let loadingErrorMessage: string;
 
-    if (exception instanceof InvalidPDFException) {
+    if (exception instanceof this._pdfjsLib.InvalidPDFException) {
       loadingErrorMessage = errorTranslations.invalidPdf;
-    } else if (exception instanceof ResponseException && exception.missing) {
+    } else if (exception instanceof this._pdfjsLib.ResponseException && exception.missing) {
       // special message for missing PDFs (e.g. HTTP 404)
       loadingErrorMessage = errorTranslations.missingPdf;
-    } else if (exception instanceof ResponseException) {
+    } else if (exception instanceof this._pdfjsLib.ResponseException) {
       loadingErrorMessage = errorTranslations.unexpectedResponse;
     } else {
       loadingErrorMessage = errorTranslations.genericError;
@@ -404,7 +407,9 @@ export class LitPdfViewer extends LitElement {
 
   private error(message: string, moreInfo: IErrorInfo): void {
     const errorTranslations = this._t.error;
-    const moreInfoText = [`PDF.js v${version || '?'} (build: ${build || '?'})`];
+    const moreInfoText = [
+      `PDF.js v${this._pdfjsLib.version || '?'} (build: ${this._pdfjsLib.build || '?'})`,
+    ];
 
     this._errorMessage = message;
     this._toggleErrorPanel({ open: true });
@@ -463,7 +468,12 @@ export class LitPdfViewer extends LitElement {
     }
   }
 
-  private initViewer(): void {
+  private async initViewer(): Promise<void> {
+    const [pdfjsLib, pdfjsViewerModule] = await Promise.all([loadPdfjsLib(), loadPdfjsViewer()]);
+    const { EventBus, PDFLinkService, PDFViewer, PDFFindController, DownloadManager, FindState } =
+      pdfjsViewerModule;
+    this._pdfjsLib = pdfjsLib;
+
     this._eventBus = new EventBus();
 
     this._pdfLinkService = new PDFLinkService({
@@ -613,7 +623,7 @@ export class LitPdfViewer extends LitElement {
     toolbar.toggleAttribute('isDownloadDisabled', true);
 
     const data = await this._pdfDocument.getData();
-    this._downloadManager.download(data, this.src, getFilenameFromUrl(this.src));
+    this._downloadManager.download(data, this.src, this._pdfjsLib.getFilenameFromUrl(this.src));
 
     toolbar.toggleAttribute('isDownloadDisabled', false);
   }
