@@ -11,6 +11,10 @@
     "rotateClockwise": "Im Uhrzeigersinn drehen",
     "print": "Drucken",
     "download": "Herunterladen",
+    "search": "Im Dokument suchen",
+    "fullscreen": "Vollbild",
+    "exitFullscreen": "Vollbild beenden",
+    "zoomPercent": "Zoomprozentsatz",
     "more": "Mehr"
   },
   "pagination": {

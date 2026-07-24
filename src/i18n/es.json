@@ -11,6 +11,10 @@
     "rotateClockwise": "Girar en sentido horario",
     "print": "Imprimir",
     "download": "Descargar",
+    "search": "Buscar en el documento",
+    "fullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
+    "zoomPercent": "Porcentaje de zoom",
     "more": "Más"
   },
   "pagination": {
