@@ -51,8 +51,8 @@
   }
 
   .sidebarIcon {
-    font-size: 16px;
-    line-height: 1;
+    width: 16px;
+    height: 16px;
   }
 
   .separator {
@@ -89,7 +89,8 @@
       border-color: var(--button-border-hover);
       background-color: var(--button-background-hover);
 
-      lit-icon {
+      lit-icon,
+      .sidebarIcon {
         color: var(--button-color-hover);
       }
     }
