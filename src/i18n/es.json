@@ -1,0 +1,43 @@
+{
+  "toolbar": {
+    "toolbarLabel": "Barra de herramientas PDF",
+    "pageNavigation": "Navegación de páginas",
+    "previousPage": "Página anterior",
+    "nextPage": "Página siguiente",
+    "pageNumber": "Número de página",
+    "zoomControls": "Controles de zoom",
+    "zoomOut": "Alejar",
+    "zoomIn": "Acercar",
+    "documentActions": "Acciones del documento",
+    "rotateCounterClockwise": "Girar en sentido antihorario",
+    "rotateClockwise": "Girar en sentido horario",
+    "print": "Imprimir",
+    "download": "Descargar",
+    "more": "Más"
+  },
+  "search": {
+    "searchLabel": "Buscar en el documento",
+    "inputLabel": "Buscar en el documento",
+    "placeholder": "Buscar...",
+    "noResults": "Sin resultados",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "close": "Cerrar"
+  },
+  "error": {
+    "moreInfo": "más información",
+    "lessInfo": "menos información",
+    "closeError": "cerrar error",
+    "invalidPdf": "Archivo PDF inválido o dañado.",
+    "missingPdf": "Archivo PDF no encontrado.",
+    "unexpectedResponse": "Respuesta inesperada del servidor.",
+    "genericError": "Se produjo un error al cargar el PDF.",
+    "messageLabel": "Mensaje",
+    "stackLabel": "Pila",
+    "fileLabel": "Archivo",
+    "lineLabel": "Línea"
+  },
+  "viewer": {
+    "loading": "Cargando: {percent}%"
+  }
+}

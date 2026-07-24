@@ -1,0 +1,43 @@
+{
+  "toolbar": {
+    "toolbarLabel": "PDF toolbar",
+    "pageNavigation": "Page navigation",
+    "previousPage": "Previous Page",
+    "nextPage": "Next Page",
+    "pageNumber": "Page number",
+    "zoomControls": "Zoom controls",
+    "zoomOut": "Zoom Out",
+    "zoomIn": "Zoom In",
+    "documentActions": "Document actions",
+    "rotateCounterClockwise": "Rotate counter clockwise",
+    "rotateClockwise": "Rotate clockwise",
+    "print": "Print",
+    "download": "Download",
+    "more": "More"
+  },
+  "search": {
+    "searchLabel": "Search in document",
+    "inputLabel": "Search in document",
+    "placeholder": "Search...",
+    "noResults": "No results",
+    "previous": "Previous",
+    "next": "Next",
+    "close": "Close"
+  },
+  "error": {
+    "moreInfo": "more info",
+    "lessInfo": "less info",
+    "closeError": "close error",
+    "invalidPdf": "Invalid or corrupted PDF file.",
+    "missingPdf": "Missing PDF file.",
+    "unexpectedResponse": "Unexpected server response.",
+    "genericError": "An error occurred while loading the PDF.",
+    "messageLabel": "Message",
+    "stackLabel": "Stack",
+    "fileLabel": "File",
+    "lineLabel": "Line"
+  },
+  "viewer": {
+    "loading": "Loading: {percent}%"
+  }
+}

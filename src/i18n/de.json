@@ -1,0 +1,43 @@
+{
+  "toolbar": {
+    "toolbarLabel": "PDF-Werkzeugleiste",
+    "pageNavigation": "Seitennavigation",
+    "previousPage": "Vorherige Seite",
+    "nextPage": "Nächste Seite",
+    "pageNumber": "Seitenzahl",
+    "zoomControls": "Zoomsteuerung",
+    "zoomOut": "Verkleinern",
+    "zoomIn": "Vergrößern",
+    "documentActions": "Dokumentaktionen",
+    "rotateCounterClockwise": "Gegen den Uhrzeigersinn drehen",
+    "rotateClockwise": "Im Uhrzeigersinn drehen",
+    "print": "Drucken",
+    "download": "Herunterladen",
+    "more": "Mehr"
+  },
+  "search": {
+    "searchLabel": "Im Dokument suchen",
+    "inputLabel": "Im Dokument suchen",
+    "placeholder": "Suchen...",
+    "noResults": "Keine Ergebnisse",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "close": "Schließen"
+  },
+  "error": {
+    "moreInfo": "mehr Info",
+    "lessInfo": "weniger Info",
+    "closeError": "Fehler schließen",
+    "invalidPdf": "Ungültige oder beschädigte PDF-Datei.",
+    "missingPdf": "PDF-Datei fehlt.",
+    "unexpectedResponse": "Unerwartete Serverantwort.",
+    "genericError": "Beim Laden der PDF ist ein Fehler aufgetreten.",
+    "messageLabel": "Nachricht",
+    "stackLabel": "Stapel",
+    "fileLabel": "Datei",
+    "lineLabel": "Zeile"
+  },
+  "viewer": {
+    "loading": "Lädt: {percent}%"
+  }
+}

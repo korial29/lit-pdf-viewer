@@ -3,6 +3,7 @@ import { customElement, property, query } from 'lit/decorators.js';
 import '../lit-icon/lit-icon';
 import '../lit-tooltip/lit-tooltip';
 import '../lit-popover/lit-popover';
+import { getTranslations, ToolbarTranslations } from '../i18n/i18n';
 
 // @ts-ignore
 import style from './lit-pdf-toolbar.scss';
@@ -15,6 +16,12 @@ export class LitPdfToolbar extends LitElement {
 
   @property({ type: Boolean }) public isDownloadDisabled: boolean;
 
+  /** Locale to translate the toolbar into (defaults to the browser's language). */
+  @property({ type: String }) public locale: string;
+
+  /** Overrides for individual translation strings. */
+  @property({ type: Object }) public translations: Partial<ToolbarTranslations> = {};
+
   @query('#previous') private _previousPageEl: HTMLButtonElement;
 
   @query('#next') private _nextPageEl: HTMLButtonElement;
@@ -25,20 +32,26 @@ export class LitPdfToolbar extends LitElement {
     return [style];
   }
 
+  private get _t(): ToolbarTranslations {
+    return getTranslations(this.locale, { toolbar: this.translations }).toolbar;
+  }
+
   public connectedCallback(): void {
     super.connectedCallback();
 
     this.setAttribute('role', 'toolbar');
-    this.setAttribute('aria-label', 'PDF toolbar');
+    this.setAttribute('aria-label', this._t.toolbarLabel);
   }
 
   public render(): TemplateResult {
+    const t = this._t;
+
     return html`
-      <section class="container" role="group" aria-label="Page navigation">
-        <lit-tooltip text="Previous Page">
+      <section class="container" role="group" aria-label=${t.pageNavigation}>
+        <lit-tooltip text=${t.previousPage}>
           <button
             class="toolbarButton pageUp"
-            aria-label="Previous Page"
+            aria-label=${t.previousPage}
             id="previous"
             disabled
             @click=${this._handlePrevious}
@@ -46,10 +59,10 @@ export class LitPdfToolbar extends LitElement {
             <lit-icon icon="arrow-up"></lit-icon>
           </button>
         </lit-tooltip>
-        <lit-tooltip text="Next Page">
+        <lit-tooltip text=${t.nextPage}>
           <button
             class="toolbarButton pageDown"
-            aria-label="Next Page"
+            aria-label=${t.nextPage}
             id="next"
             @click=${this._handleNext}
           >
@@ -64,7 +77,7 @@ export class LitPdfToolbar extends LitElement {
           value="1"
           size="4"
           min="1"
-          aria-label="Page number"
+          aria-label=${t.pageNumber}
           aria-describedby="pageCount"
           @change=${this._handlePageChange}
         />
@@ -73,21 +86,21 @@ export class LitPdfToolbar extends LitElement {
 
       <span class="separator" role="separator" aria-orientation="vertical"></span>
 
-      <section class="container" role="group" aria-label="Zoom controls">
-        <lit-tooltip text="Zoom Out">
+      <section class="container" role="group" aria-label=${t.zoomControls}>
+        <lit-tooltip text=${t.zoomOut}>
           <button
             class="toolbarButton zoomOut"
-            aria-label="Zoom Out"
+            aria-label=${t.zoomOut}
             id="zoomOut"
             @click=${this._handleZoomOut}
           >
             <lit-icon icon="minus"></lit-icon>
           </button>
         </lit-tooltip>
-        <lit-tooltip text="Zoom In">
+        <lit-tooltip text=${t.zoomIn}>
           <button
             class="toolbarButton zoomIn"
-            aria-label="Zoom In"
+            aria-label=${t.zoomIn}
             id="zoomIn"
             @click=${this._handleZoomIn}
           >
@@ -98,31 +111,31 @@ export class LitPdfToolbar extends LitElement {
 
       <span class="separator" role="separator" aria-orientation="vertical"></span>
 
-      <section class="container actions" role="group" aria-label="Document actions">
+      <section class="container actions" role="group" aria-label=${t.documentActions}>
         <!-- Secondary actions: inline on desktop, hidden on small screens where
              they move into the "..." overflow menu below. -->
-        <lit-tooltip class="inlineOnly" text="Rotate counter clockwise">
+        <lit-tooltip class="inlineOnly" text=${t.rotateCounterClockwise}>
           <button
             class="toolbarButton rotateCcw"
-            aria-label="Rotate counter clockwise"
+            aria-label=${t.rotateCounterClockwise}
             @click=${this._handleRotateCcw}
           >
             <lit-icon icon="rotate-ccw"></lit-icon>
           </button>
         </lit-tooltip>
-        <lit-tooltip class="inlineOnly" text="Rotate clockwise">
+        <lit-tooltip class="inlineOnly" text=${t.rotateClockwise}>
           <button
             class="toolbarButton rotateCw"
-            aria-label="Rotate clockwise"
+            aria-label=${t.rotateClockwise}
             @click=${this._handleRotateCw}
           >
             <lit-icon icon="rotate-cw"></lit-icon>
           </button>
         </lit-tooltip>
-        <lit-tooltip class="inlineOnly" text="Print">
+        <lit-tooltip class="inlineOnly" text=${t.print}>
           <button
             class="toolbarButton print"
-            aria-label="Print"
+            aria-label=${t.print}
             @click=${!this.isPrintDisabled && this._handlePrint}
             ?disabled=${this.isPrintDisabled}
           >
@@ -130,10 +143,10 @@ export class LitPdfToolbar extends LitElement {
           </button>
         </lit-tooltip>
 
-        <lit-tooltip class="inlineOnly" text="Download">
+        <lit-tooltip class="inlineOnly" text=${t.download}>
           <button
             class="toolbarButton download"
-            aria-label="Download"
+            aria-label=${t.download}
             @click=${!this.isDownloadDisabled && this._handleDownload}
             ?disabled=${this.isDownloadDisabled}
           >
@@ -143,16 +156,21 @@ export class LitPdfToolbar extends LitElement {
 
         <!-- On small screens the secondary actions collapse into this "..."
              overflow menu, pinned to the far right. It is hidden on desktop. -->
-        <lit-tooltip class="moreWrapper" text="More">
+        <lit-tooltip class="moreWrapper" text=${t.more}>
           <lit-popover class="morePopover" align="right">
-            <button slot="anchor" class="toolbarButton more" aria-label="More" aria-haspopup="menu">
+            <button
+              slot="anchor"
+              class="toolbarButton more"
+              aria-label=${t.more}
+              aria-haspopup="menu"
+            >
               <span class="moreIcon" aria-hidden="true">⋯</span>
             </button>
 
             <button
               class="toolbarButton rotateCcw"
-              title="Rotate counter clockwise"
-              aria-label="Rotate counter clockwise"
+              title=${t.rotateCounterClockwise}
+              aria-label=${t.rotateCounterClockwise}
               role="menuitem"
               @click=${this._handleRotateCcw}
             >
@@ -160,8 +178,8 @@ export class LitPdfToolbar extends LitElement {
             </button>
             <button
               class="toolbarButton rotateCw"
-              title="Rotate clockwise"
-              aria-label="Rotate clockwise"
+              title=${t.rotateClockwise}
+              aria-label=${t.rotateClockwise}
               role="menuitem"
               @click=${this._handleRotateCw}
             >
@@ -169,8 +187,8 @@ export class LitPdfToolbar extends LitElement {
             </button>
             <button
               class="toolbarButton print"
-              title="Print"
-              aria-label="Print"
+              title=${t.print}
+              aria-label=${t.print}
               role="menuitem"
               @click=${!this.isPrintDisabled && this._handlePrint}
               ?disabled=${this.isPrintDisabled}
@@ -179,8 +197,8 @@ export class LitPdfToolbar extends LitElement {
             </button>
             <button
               class="toolbarButton download"
-              title="Download"
-              aria-label="Download"
+              title=${t.download}
+              aria-label=${t.download}
               role="menuitem"
               @click=${!this.isDownloadDisabled && this._handleDownload}
               ?disabled=${this.isDownloadDisabled}
@@ -191,6 +209,12 @@ export class LitPdfToolbar extends LitElement {
         </lit-tooltip>
       </section>
     `;
+  }
+
+  protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    if (changedProperties.has('locale') || changedProperties.has('translations')) {
+      this.setAttribute('aria-label', this._t.toolbarLabel);
+    }
   }
 
   protected firstUpdated(): void {

@@ -1,0 +1,43 @@
+{
+  "toolbar": {
+    "toolbarLabel": "Barre d'outils PDF",
+    "pageNavigation": "Navigation des pages",
+    "previousPage": "Page précédente",
+    "nextPage": "Page suivante",
+    "pageNumber": "Numéro de page",
+    "zoomControls": "Contrôles de zoom",
+    "zoomOut": "Zoom arrière",
+    "zoomIn": "Zoom avant",
+    "documentActions": "Actions du document",
+    "rotateCounterClockwise": "Rotation antihoraire",
+    "rotateClockwise": "Rotation horaire",
+    "print": "Imprimer",
+    "download": "Télécharger",
+    "more": "Plus"
+  },
+  "search": {
+    "searchLabel": "Recherche dans le document",
+    "inputLabel": "Rechercher dans le document",
+    "placeholder": "Rechercher...",
+    "noResults": "Aucun résultat",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "close": "Fermer"
+  },
+  "error": {
+    "moreInfo": "plus d'informations",
+    "lessInfo": "moins d'informations",
+    "closeError": "fermer l'erreur",
+    "invalidPdf": "Fichier PDF invalide ou corrompu.",
+    "missingPdf": "Fichier PDF manquant.",
+    "unexpectedResponse": "Réponse du serveur inattendue.",
+    "genericError": "Une erreur est survenue lors du chargement du PDF.",
+    "messageLabel": "Message",
+    "stackLabel": "Pile",
+    "fileLabel": "Fichier",
+    "lineLabel": "Ligne"
+  },
+  "viewer": {
+    "loading": "Chargement : {percent}%"
+  }
+}
