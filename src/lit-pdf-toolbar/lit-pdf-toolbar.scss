@@ -12,6 +12,13 @@
     color-mix(in srgb, #{map-get($primary-color, 'medium')} 12%, transparent)
   );
   --button-focus-ring: var(--litpdf-focus-ring-color, #{map-get($primary-color, 'medium')});
+  --input-border: var(--litpdf-border-color, #{map-get($primary-color-2, '50')});
+  --input-border-hover: var(--litpdf-border-color-hover, #{map-get($primary-color-2, '75')});
+  // Fixed px (not a `%` height) so every separator — whether it's a direct
+  // child of `:host` or nested inside a heightless `.container` — ends up
+  // the same visual height. Kept at half the toolbar's own height, updated
+  // alongside it in each breakpoint below.
+  --separator-height: 21px;
   --toolbar-color: var(--litpdf-toolbar-background, #fff);
   --toolbar-shadow: var(--litpdf-toolbar-shadow, 0 1px 3px rgba(30, 16, 106, 0.15));
   color: var(--litpdf-icon-color, #{map-get($primary-color-2, 'normal')});
@@ -50,13 +57,63 @@
     letter-spacing: 1px;
   }
 
-  .sidebarIcon {
+  .sidebarIcon,
+  .searchIcon,
+  .fullscreenIcon {
     width: 16px;
     height: 16px;
   }
 
+  .zoomPercent {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    color: inherit;
+  }
+
+  .zoomPercentInput {
+    width: 36px;
+    padding: 2px 4px;
+    // Same 1px bordered look as `lit-input` (not the borderless
+    // transparent/hover-fill treatment the icon buttons use), so it reads as
+    // a text field rather than another toolbar button.
+    border: 1px solid var(--input-border);
+    border-radius: var(--button-radius);
+    background-color: var(--litpdf-surface-background, #fff);
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+    text-align: right;
+    box-sizing: border-box;
+    transition:
+      border-color 120ms,
+      box-shadow 120ms;
+
+    // Hide the native up/down spinners so the field reads as a plain
+    // percentage display that happens to be editable.
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &:hover {
+      border-color: var(--input-border-hover);
+    }
+
+    &:focus-visible {
+      outline: 0;
+      border-color: var(--button-focus-ring);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--button-focus-ring) 30%, transparent);
+    }
+  }
+
   .separator {
-    height: 50%;
+    align-self: center;
+    height: var(--separator-height);
     width: 1px;
     background-color: var(--litpdf-border-color, #{map-get($primary-color-2, '50')});
   }
@@ -107,35 +164,53 @@
 
     // Toggle buttons (e.g. the sidebar toggle) reuse the hover treatment to
     // show they're "pressed" while their panel is open.
-    &[aria-expanded='true'] {
+    &[aria-expanded='true'],
+    &[aria-pressed='true'] {
       border-color: var(--button-border-hover);
       background-color: var(--button-background-hover);
     }
   }
 
   // On small screens the row can't hold every button, so we move the rotate
-  // actions into the "..." overflow menu (print/download stay inline — we
-  // have the room now that page navigation lives in its own floating
-  // pagination pill) and enlarge the remaining controls to comfortable ~44px
-  // touch targets (Apple HIG minimum).
+  // and fullscreen actions into the "..." overflow menu (print/download/
+  // search stay inline — we have the room now that page navigation lives in
+  // its own floating pagination pill) and enlarge the remaining controls to
+  // comfortable ~44px touch targets (Apple HIG minimum).
   @media (max-width: 600px) {
     --button-width: 44px;
     --button-height: 44px;
 
-    gap: 8px;
+    // Tighter than the desktop 16px/8px gaps — the search button (always
+    // inline, unlike rotate/fullscreen) adds width back that the overflow
+    // menu doesn't reclaim, so the row needs to run leaner to still fit on
+    // mainstream phone widths (~375px+) without horizontal scrolling.
+    gap: 4px;
     height: 48px;
+    --separator-height: 24px;
 
     .container {
-      gap: 6px;
+      gap: 4px;
     }
 
-    // Hide the inline rotate buttons; they live in the "..." menu instead.
+    // Hide the inline rotate/fullscreen buttons and their separator; they
+    // live in the "..." menu instead.
     .inlineOnly {
       display: none;
     }
 
     .moreWrapper {
       display: inline-flex;
+    }
+
+    .zoomPercentInput {
+      width: 32px;
+      font-size: 14px;
+    }
+
+    // Drop the "%" suffix — the field is already labelled for screen
+    // readers via aria-label, and every pixel counts on phone widths.
+    .zoomPercent span {
+      display: none;
     }
   }
 
@@ -147,5 +222,10 @@
     --button-height: 40px;
 
     height: 44px;
+    --separator-height: 22px;
+
+    .zoomPercentInput {
+      width: 30px;
+    }
   }
 }

@@ -289,6 +289,15 @@
   }
 }
 
+// The Fullscreen API replaces the host's normal box with the top layer,
+// which doesn't inherit the consumer's sizing — pin it to the viewport
+// explicitly so the toolbar + viewer layout still fills the screen.
+:host(:fullscreen) {
+  width: 100%;
+  height: 100%;
+  background-color: var(--litpdf-surface-background, #fff);
+}
+
 :host([loaded]) {
   .pdfViewer .page .loadingIcon {
     display: none;

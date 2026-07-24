@@ -15,6 +15,10 @@ export interface ToolbarTranslations {
   rotateClockwise: string;
   print: string;
   download: string;
+  search: string;
+  fullscreen: string;
+  exitFullscreen: string;
+  zoomPercent: string;
   more: string;
 }
 

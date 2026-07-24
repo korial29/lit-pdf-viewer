@@ -16,6 +16,11 @@ export class LitPdfToolbar extends LitElement {
 
   @property({ type: Boolean }) public isSidebarOpen: boolean;
 
+  @property({ type: Boolean }) public isFullscreen: boolean;
+
+  /** Current zoom level as a percentage (e.g. `100` for 100%). */
+  @property({ type: Number }) public zoomPercent = 100;
+
   /** Locale to translate the toolbar into (defaults to the browser's language). */
   @property({ type: String }) public locale: string;
 
@@ -69,6 +74,20 @@ export class LitPdfToolbar extends LitElement {
       <span class="separator" role="separator" aria-orientation="vertical"></span>
 
       <section class="container" role="group" aria-label=${t.zoomControls}>
+        <div class="zoomPercent">
+          <input
+            type="number"
+            class="zoomPercentInput"
+            aria-label=${t.zoomPercent}
+            min="25"
+            max="1000"
+            step="1"
+            .value=${String(this.zoomPercent)}
+            @change=${this._handleZoomPercentChange}
+            @keydown=${this._handleZoomPercentKeydown}
+          />
+          <span aria-hidden="true">%</span>
+        </div>
         <lit-tooltip text=${t.zoomOut}>
           <button
             class="toolbarButton zoomOut"
@@ -114,6 +133,9 @@ export class LitPdfToolbar extends LitElement {
             <lit-icon icon="rotate-cw"></lit-icon>
           </button>
         </lit-tooltip>
+
+        <span class="separator inlineOnly" role="separator" aria-orientation="vertical"></span>
+
         <lit-tooltip text=${t.print}>
           <button
             class="toolbarButton print"
@@ -136,8 +158,42 @@ export class LitPdfToolbar extends LitElement {
           </button>
         </lit-tooltip>
 
-        <!-- On small screens the rotate buttons collapse into this "..."
-             overflow menu, pinned to the far right. It is hidden on desktop. -->
+        <lit-tooltip text=${t.search}>
+          <button
+            class="toolbarButton search"
+            aria-label=${t.search}
+            @click=${this._handleToggleSearch}
+          >
+            <svg
+              class="searchIcon"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </lit-tooltip>
+
+        <lit-tooltip class="inlineOnly" text=${this.isFullscreen ? t.exitFullscreen : t.fullscreen}>
+          <button
+            class="toolbarButton fullscreen"
+            aria-label=${this.isFullscreen ? t.exitFullscreen : t.fullscreen}
+            aria-pressed=${this.isFullscreen ? 'true' : 'false'}
+            @click=${this._handleToggleFullscreen}
+          >
+            ${this._renderFullscreenIcon()}
+          </button>
+        </lit-tooltip>
+
+        <!-- On small screens the rotate and fullscreen buttons collapse into
+             this "..." overflow menu, pinned to the far right. It is hidden
+             on desktop. -->
         <lit-tooltip class="moreWrapper" text=${t.more}>
           <lit-popover class="morePopover" align="right">
             <button
@@ -167,10 +223,57 @@ export class LitPdfToolbar extends LitElement {
             >
               <lit-icon icon="rotate-cw"></lit-icon>
             </button>
+            <button
+              class="toolbarButton fullscreen"
+              title=${this.isFullscreen ? t.exitFullscreen : t.fullscreen}
+              aria-label=${this.isFullscreen ? t.exitFullscreen : t.fullscreen}
+              role="menuitem"
+              @click=${this._handleToggleFullscreen}
+            >
+              ${this._renderFullscreenIcon()}
+            </button>
           </lit-popover>
         </lit-tooltip>
       </section>
     `;
+  }
+
+  private _renderFullscreenIcon(): TemplateResult {
+    return this.isFullscreen
+      ? html`
+          <svg
+            class="fullscreenIcon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M8 3v3a2 2 0 0 1-2 2H3"></path>
+            <path d="M21 8h-3a2 2 0 0 1-2-2V3"></path>
+            <path d="M3 16h3a2 2 0 0 1 2 2v3"></path>
+            <path d="M16 21v-3a2 2 0 0 1 2-2h3"></path>
+          </svg>
+        `
+      : html`
+          <svg
+            class="fullscreenIcon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
+            <path d="M21 8V5a2 2 0 0 0-2-2h-3"></path>
+            <path d="M3 16v3a2 2 0 0 0 2 2h3"></path>
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
+          </svg>
+        `;
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
@@ -201,6 +304,28 @@ export class LitPdfToolbar extends LitElement {
 
   private _handleRotateCcw(): void {
     this.dispatchEvent(new CustomEvent('rotateCcw', { bubbles: true }));
+  }
+
+  private _handleToggleSearch(): void {
+    this.dispatchEvent(new CustomEvent('toggleSearch', { bubbles: true }));
+  }
+
+  private _handleToggleFullscreen(): void {
+    this.dispatchEvent(new CustomEvent('toggleFullscreen', { bubbles: true }));
+  }
+
+  private _handleZoomPercentChange(e: Event): void {
+    const value = Number((<HTMLInputElement>e.target).value);
+    if (!value) {
+      return;
+    }
+    this.dispatchEvent(new CustomEvent('zoomChange', { bubbles: true, detail: { value } }));
+  }
+
+  private _handleZoomPercentKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Enter') {
+      (<HTMLInputElement>e.target).blur();
+    }
   }
 
   private _handlePrint(): void {

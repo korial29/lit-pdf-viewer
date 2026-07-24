@@ -116,6 +116,10 @@ export class LitPdfViewer extends LitElement {
 
   @state() private _sidebarOpen = false;
 
+  @state() private _isFullscreen = false;
+
+  @state() private _zoomPercent = 100;
+
   @state() private _currentPage = 1;
 
   private _searchQueriesNormalized: string[];
@@ -181,6 +185,7 @@ export class LitPdfViewer extends LitElement {
 
     window.addEventListener('resize', this._handleWindowResise);
     window.addEventListener('keydown', this._handleGlobalKeydown);
+    this.addEventListener('fullscreenchange', this._handleFullscreenChange);
   }
 
   public disconnectedCallback(): void {
@@ -190,6 +195,7 @@ export class LitPdfViewer extends LitElement {
 
     window.removeEventListener('resize', this._handleWindowResise);
     window.removeEventListener('keydown', this._handleGlobalKeydown);
+    this.removeEventListener('fullscreenchange', this._handleFullscreenChange);
     this._viewerContainer?.removeEventListener('scroll', this._handleViewerScroll);
     clearTimeout(this._paginationHideTimeout);
   }
@@ -208,11 +214,16 @@ export class LitPdfViewer extends LitElement {
           @rotateCcw=${this._handleRotateCcw}
           @print=${this._handlePrint}
           @download=${this._handleDownload}
+          @toggleSearch=${this._handleToggleSearch}
+          @toggleFullscreen=${this._handleToggleFullscreen}
+          @zoomChange=${this._handleZoomChange}
         >
           <lit-pdf-toolbar
             isDownloadDisabled
             isPrintDisabled
             ?isSidebarOpen=${this._sidebarOpen}
+            ?isFullscreen=${this._isFullscreen}
+            zoomPercent=${this._zoomPercent}
             locale=${this.locale}
             .translations=${this.translations?.toolbar}
           ></lit-pdf-toolbar
@@ -493,6 +504,10 @@ export class LitPdfViewer extends LitElement {
       this._pdfViewer.currentScaleValue = this.scale;
     });
 
+    this._eventBus.on('scalechanging', ({ scale }) => {
+      this._zoomPercent = Math.round(scale * 100);
+    });
+
     this._eventBus.on('updatefindmatchescount', ({ matchesCount }) => {
       this._searchMatchCount = matchesCount.total;
       this._searchCurrentMatch = matchesCount.current;
@@ -523,6 +538,11 @@ export class LitPdfViewer extends LitElement {
       newScale = Math.max(MIN_SCALE, newScale);
     } while (--ticks && newScale > MIN_SCALE);
     this._pdfViewer.currentScaleValue = newScale.toString();
+  }
+
+  private _handleZoomChange(e: CustomEvent<{ value: number }>): void {
+    const clampedPercent = Math.min(MAX_SCALE * 100, Math.max(MIN_SCALE * 100, e.detail.value));
+    this._pdfViewer.currentScaleValue = (clampedPercent / 100).toString();
   }
 
   private _handleRotateCw(): void {
@@ -622,6 +642,26 @@ export class LitPdfViewer extends LitElement {
       e.preventDefault();
       this._searchOpen = true;
     }
+  };
+
+  private _handleToggleSearch(): void {
+    if (this._searchOpen) {
+      this._handleSearchClose();
+    } else {
+      this._searchOpen = true;
+    }
+  }
+
+  private async _handleToggleFullscreen(): Promise<void> {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      await this.requestFullscreen();
+    }
+  }
+
+  private _handleFullscreenChange = (): void => {
+    this._isFullscreen = document.fullscreenElement === this;
   };
 
   private _handleSearchQuery(e: CustomEvent<{ query: string }>): void {
